@@ -11,9 +11,9 @@ Topic's provide
 * the capability to define event handlers that are called when a message is published on the Topic
 
 
-# FUNCTIONS
+# Topics
 
-### new Topic(name)
+### new PubSub.Topic(name)
 Creates a new Topic to store messages under your chosen name. 
 
 ##### Arguments
