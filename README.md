@@ -2,7 +2,7 @@
 
 This package provides the capability of defining a Topic for publishing messages.
 
-A message can be an unstructure or structure JSON document.  You decide for each Topic.A
+A message can be an unstructure or structure JSON document.  You decide for each Topic.
 
 Topic's provide 
 * the capability of publishing messages and validating their structure
