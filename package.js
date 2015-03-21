@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'lablancas:messaging-system',
+    name: 'lablancas:pubsub',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: 'A publish/subscribe package designed for Meteor',
@@ -28,7 +28,7 @@ Package.onUse(function(api) {
 Package.onTest(function(api) {
     api.use('tinytest');
     api.use('underscore');
-    api.use('lablancas:messaging-system');
+    api.use('lablancas:pubsub');
     
     api.use('aldeed:simple-schema@1.0.3');
     
