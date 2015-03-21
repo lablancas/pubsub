@@ -16,7 +16,7 @@ Package.onUse(function(api) {
     api.use('mongo');
     
     api.use('aldeed:collection2@2.1.0');
-    api.use('matb33:collection-hooks');
+    api.use('matb33:collection-hooks@0.7.6');
 
     api.addFiles('message-schema.js');
     api.addFiles('topic.js');
