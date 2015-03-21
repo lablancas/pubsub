@@ -11,34 +11,34 @@ Topic's provide
 
 # FUNCTIONS
 
-#### new Topic(name)
+### new Topic(name)
 Creates a new Topic to store messages under your chosen name. 
 
-###### Arguments
+##### Arguments
 *name* String
 The unique name you want to give to your topic for publishing messages
 
-#### Topic.getChannel()
+### Topic.getChannel()
 Returns the channel (Mongo.Collection) for storing messages published on this Topic
 
-#### Topic.getName()
+### Topic.getName()
 Returns the name assigned to this topic. This was provided into the constructor method
 
-#### Topic.getFullName()
+### Topic.getFullName()
 Returns the full name assigned to this topic. This was derived by the constructor based on the provided name.
 
-#### Topic.getActiveSubscribers()
+### Topic.getActiveSubscribers()
 Returns the current, active subscribers
 
-#### Topic.find(selector, options)
+### Topic.find(selector, options)
 See Mongo.Collection.find
 http://docs.meteor.com/#/full/find
 
-#### Topic.findOne(selector, options)
+### Topic.findOne(selector, options)
 See Mongo.Collection.find
 http://docs.meteor.com/#/full/findone
 
-#### Topic.setSchema(schema)
+### Topic.setSchema(schema)
 Sets the Message Body schema for this Topic. Returns void.
 
 *schema* Object
@@ -50,7 +50,7 @@ https://atmospherejs.com/aldeed/collection2
 https://atmospherejs.com/aldeed/simple-schema
 
 
-#### Topic.getSchema()
+### Topic.getSchema()
 Returns the SimpleSchema Object attached to this Topic.
 
 See Collection2 and SimpleSchema
@@ -58,10 +58,10 @@ See Collection2 and SimpleSchema
 https://atmospherejs.com/aldeed/collection2
 https://atmospherejs.com/aldeed/simple-schema
 
-#### Topic.publish(messageBody, callback)
+### Topic.publish(messageBody, callback)
 Publish a message on a topic. Returns its unique _id.
 
-###### Arguments
+##### Arguments
 
 *messageBody* Object
 The body of the message to publish. May not yet have an _id attribute, in which case Meteor will generate one for you.
@@ -69,10 +69,10 @@ The body of the message to publish. May not yet have an _id attribute, in which 
 *callback* Function
 Optional. If present, called with an error object as the first argument and, if no error, the _id as the second.
 
-#### Topic.subscribe(fn, selector, architecture)    
+### Topic.subscribe(fn, selector, architecture)    
 Creates a topic subscriber which calls the function defined by the caller. Returns a Subscriber Object.
 
-###### Arguments
+##### Arguments
 *fn* Function
 Function to call when a message is created on this topic. Called with a userId as the first argument and the message as the second.
 
@@ -84,9 +84,9 @@ If you only want to enable your subscription on the server (or the client), you 
 
 TODO add subscriber name/id as an input parameter?
 
-#### Topic.unsubscribe(subscriber)
+### Topic.unsubscribe(subscriber)
 Removes a topic subscriber
 
-###### Arguments
+##### Arguments
 *subscriber* Object
 The object returned from calling subscribe
