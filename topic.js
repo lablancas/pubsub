@@ -6,9 +6,15 @@
 * To change this template use Tools | Templates.
 */
 
-
-
-
+/** 
+  * This package provides the capability of defining a Topic for publishing messages.
+  * 
+  * A message can be an unstructure or structure JSON document.  You decide for each Topic.
+  * 
+  * A Topic provides
+  *   > the capability of publishing messages and validating their structure
+  *   > the capability to define event handlers that are called when a message is published on the Topic
+  */ 
 PubSub.Topic = function(name){
     
     var _self = this;
@@ -44,13 +50,23 @@ PubSub.Topic = function(name){
         check(message, Object);
         
         _self.getActiveSubscribers().forEach(function(subscriber){
-            if( checkArchitecture(subscriber.architecture) && isInSelector(message, subscriber.selector) ){
+            var selector = JSON.parse(subscriber.selector);
+            
+            if( _self.checkArchitecture(subscriber.architecture) && _self.matchesSelector(message, selector) ){
                 _subscriberFunctions[subscriber._id](userId, message);
             }
 
         });
     };
     
+    
+    
+    /*****************************************************************************************************
+     * 
+     * PUBLIC METHODS
+     * 
+     * 
+     */
     
     /**
      * Determines if a doc matches a selector.
@@ -64,13 +80,16 @@ PubSub.Topic = function(name){
      * A query describing the message documents to find
      * 
      */
-    var isInSelector = function(message, selector){
+    _self.matchesSelector = function(message, selector){
         check(message,     Object);
         check(message._id, String);
         check(selector,    Match.Optional(Object));
         
-        var s = selector || {};
-        s._id = message._id;
+        var s = {$and: [{_id: message._id}]}
+            
+        if( !_.isUndefined(selector))
+            s.$and.push(selector);
+        
         return !_.isUndefined( _channel.findOne(s) );
     };
     
@@ -79,12 +98,12 @@ PubSub.Topic = function(name){
      * 
      * Arguments:
      * 
-     * architecture String
+     * architecture [String]
      * 'server', 'client', 'web.browser', 'web.cordova'
      * 
      */
-    var checkArchitecture = function(architecture){
-        check(architecture, Array );
+    _self.checkArchitecture = function(architecture){
+        check(architecture, Array);
         
         if( architecture.length === 0 )
             return true;
@@ -102,20 +121,6 @@ PubSub.Topic = function(name){
             return false;
     };
     
-    
-    /*****************************************************************************************************
-     * 
-     * PUBLIC METHODS
-     * 
-     * 
-     */
-    
-    /**
-     * Returns the channel (Mongo.Collection) for storing messages published on this Topic
-     */
-    _self.getChannel = function(){
-        return _channel;
-    };
     
     /**
      * Returns the name assigned to this topic. This was provided into the constructor method
@@ -135,7 +140,7 @@ PubSub.Topic = function(name){
      * Returns the current, active subscribers
      */
     _self.getActiveSubscribers = function(){
-        return PubSub.TopicSubscribers.find({topic: _fullname, stoppedAt: {$exists: false}});  
+        return TopicSubscribers.find({topic: _self.getFullName(), stoppedAt: {$exists: false}});  
     };
     
     /**
@@ -158,28 +163,22 @@ PubSub.Topic = function(name){
      * Sets the Message Body schema for this Topic. Returns void.
      * 
      * schema Object
-     * The schema you want to use for the body of a message document. Follow the structure defined by SimpleSchema.
+     * The schema you want to use for the body of a message document. 
+     * This object will be assigned as the type value of the message 
+     * body so you can use a Javascript Object including a SimpleSchema 
+     * Object (see https://github.com/aldeed/meteor-simple-schema#schema-rules).
      * 
      * See Collection2 and SimpleSchema
      * 
      * https://atmospherejs.com/aldeed/collection2
      * https://atmospherejs.com/aldeed/simple-schema
      * 
-     * TODO allow user to provide a SimpleSchema Object or Object
      */
     _self.setSchema = function(schema){
-        check(schema, Match.Optional(Object));
-        
-        var messageSchema = _.clone(MESSAGE_SCHEMA);
+        var messageSchema = _.clone(MessageSchema);
 
-        if( !_.isUndefined(schema) ){
-
-            messageSchema.body = {type: Object};
-
-            for(k in schema)
-                messageSchema["body." + k] = schema[k];
-
-        }
+        if( !_.isUndefined(schema) )
+            messageSchema.body = {type: schema};
   
         _channel.attachSchema( new SimpleSchema(messageSchema) , {replace: true});
     };
@@ -211,7 +210,10 @@ PubSub.Topic = function(name){
     _self.publish = function(messageBody, callback){
         check(messageBody, Match.Optional(Object)   );
         check(callback,    Match.Optional(Function) );
-        return _channel.insert({ body: _.clone(messageBody) }, callback);
+        
+        
+        var message = { header: { destination: _self.getFullName(), type: _self.getName() }, body: _.clone(messageBody) };
+        return _channel.insert(message, callback);
     };
     
     /**
@@ -225,18 +227,20 @@ PubSub.Topic = function(name){
      * selector Mongo Selector, Object ID, or String
      * A query describing the documents to find
      * 
-     * architecture String
+     * architecture [String]
      * If you only want to enable your subscription on the server (or the client), you can pass in the second argument (e.g., 'server', 'client', 'web.browser', 'web.cordova') to specify where the subscription is enabled.
      * 
-     * TODO add subscriber name/id as an input parameter?
      */
     _self.subscribe = function(fn, selector, architecture){
         check(fn,           Function);
         check(selector,     Match.Optional(Object));
-        check(architecture, Match.Optional(String));
+        check(architecture, Match.Optional(Array));
         
-        var subscriber = {topic: _fullname, selector: selector || {}, architecture: architecture || [], startedAt: new Date()};
-        subscriber._id = PubSub.TopicSubscribers.insert(subscriber);
+        var subscriber = {topic: _self.getFullName(), 
+                          selector: JSON.stringify(selector || {}), 
+                          architecture: architecture || [], 
+                          startedAt: new Date()};
+        subscriber._id = TopicSubscribers.insert(subscriber);
 
         _subscriberFunctions[subscriber._id] = fn;
 
@@ -257,12 +261,12 @@ PubSub.Topic = function(name){
         check(subscriber._id,   String);
         check(subscriber.topic, String);
         
-        if(subscriber.topic === _fullname){
-            PubSub.TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
+        if(subscriber.topic === _self.getFullName()){
+            TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
             delete _subscriberFunctions[subscriber._id];
         }
         else{
-            throw new Meteor.Error('invalid-subscriber', "Please provide a valid subscriber for topic '" + _fullname + "'.");
+            throw new Meteor.Error('invalid-subscriber', "Please provide a valid subscriber for topic '" + _self.getFullName() + "'.");
         }
     };
     

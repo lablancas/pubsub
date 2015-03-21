@@ -1,0 +1,4 @@
+TODO add subscriber name/id as an input parameter to Topic.subscribe
+TODO add publishedTo [] to log subscriber IDs in MESSAGE_SCHEMA
+
+TODO Test Topic.subscribe with architecture

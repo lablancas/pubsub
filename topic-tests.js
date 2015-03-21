@@ -10,14 +10,14 @@ TEST_CASES = [
     {name: 'NO   message schema & NO   message body = SUCCESS', 
      success: true},
 
+    {name: 'NO message schema & WITH message body & VALID message body schema = SUCCESS',
+     body: {text: 'Hello World'}, success: true},
+    
     {name: 'WITH message schema & WITH message body & VALID message body schema = SUCCESS',
      schema: {text: {type: String}}, body: {text: 'Hello World'}, success: true},
 
     {name: 'WITH message schema & WITH message body & extra property = SUCCESS',
      schema: {text: {type: String}}, body: {text: 'Hello World', comment: 'This should not work'}, success: true},
-
-    //{name: 'WITH message schema & WITH message body & convertible property type = SUCCESS',
-    // schema: {text: {type: String}}, body: {text: 1}, success: true},
 
     {name: 'WITH message schema & NO   message body = ERROR',
      schema: {text: {type: String}}, success: false},
@@ -34,45 +34,83 @@ TEST_CASES = [
 ];
 
 Tinytest.add('PubSub - Topic Constructor', function(test){
+    var debug = false;
+    SimpleSchema.debug = debug;
+    
     var topic = new PubSub.Topic(test.id);
     
     // PRIVATE variables and methods not accessible
-    test.isUndefined( topic._self );
-    test.isUndefined( topic._name );
-    test.isUndefined( topic._topic );
-    test.isUndefined( topic._subscribers );
-    test.isUndefined( topic._subscriberFunctions );
+    test.isUndefined( topic._self,                "_self should be a private property" );
+    test.isUndefined( topic._name,                "_name should be a private property" );
+    test.isUndefined( topic._fullname,            "_fullname should be a private property" );
+    test.isUndefined( topic._channel,             "_channel should be a private property" );
+    test.isUndefined( topic._subscriberFunctions, "_subscriberFunctions should be a private property" );
     
     test.isUndefined( topic._publishToSubscribers );
-    test.isUndefined( topic.isInSelector );
-    test.isUndefined( topic.checkArchitecture );
     
     // PUBLIC methods are accessible and functions
-    test.isTrue( _.isFunction(topic.getChannel) );
-    test.isTrue( _.isFunction(topic.getName) );
-    test.isTrue( _.isFunction(topic.getFullName) );
-    
-    test.isTrue( _.isFunction(topic.getActiveSubscribers) );
-    
-    test.isTrue( _.isFunction(topic.find) );
-    test.isTrue( _.isFunction(topic.findOne) );
-    
-    test.isTrue( _.isFunction(topic.setSchema) );
-    test.isTrue( _.isFunction(topic.getSchema) );
-    
-    test.isTrue( _.isFunction(topic.publish) );
-    test.isTrue( _.isFunction(topic.subscribe) );
-    test.isTrue( _.isFunction(topic.unsubscribe) );
+    test.isTrue( _.isFunction(topic.matchesSelector)  ,     "Matches Selector should be a public function" );
+    test.isTrue( _.isFunction(topic.checkArchitecture),     "Check Architecture should be a public function" );
+    test.isTrue( _.isFunction(topic.getName),               "Get Name should be a public function"  );
+    test.isTrue( _.isFunction(topic.getFullName),           "Get Full Name should be a public function"  );
+    test.isTrue( _.isFunction(topic.getActiveSubscribers),  "Get Active Subscribers should be a public function"  );
+    test.isTrue( _.isFunction(topic.find),                  "Find should be a public function"  );
+    test.isTrue( _.isFunction(topic.findOne),               "Find One should be a public function"  );
+    test.isTrue( _.isFunction(topic.setSchema),             "Set Schema should be a public function"  );
+    test.isTrue( _.isFunction(topic.getSchema),             "Get Schema should be a public function"  );
+    test.isTrue( _.isFunction(topic.publish),               "Publish should be a public function"  );
+    test.isTrue( _.isFunction(topic.subscribe),             "Subscribe should be a public function"  );
+    test.isTrue( _.isFunction(topic.unsubscribe),           "Unsubscribe should be a public function"  );
     
     test.equal(0, topic.getActiveSubscribers().count() );
     
-    test.equal(test.id, topic.getName());
-    test.equal("pubsub.topic." + test.id, topic.getFullName());
+    test.equal(test.id, topic.getName(), "Topic Name should match");
+    var name = topic.getName();
+    name = "changed";
+    test.equal("changed", name);
+    test.equal(test.id, topic.getName(), "Topic Name should be unchanged");
     
+    
+    test.equal("pubsub.topic." + test.id, topic.getFullName(), "Topic Full Name should match");
+    var fullname = topic.getFullName();
+    fullname = "changed";
+    test.equal("changed", fullname);
+    test.equal("pubsub.topic." + test.id, topic.getFullName(), "Topic Full Name should be unchanged");
+    
+    
+    test.isFalse( topic.matchesSelector({_id: test.id}),     "No match with undefined selector" );
+    test.isFalse( topic.matchesSelector({_id: test.id}, {}), "No match with empty object selector" );
+    
+    if(Meteor.isServer){
+        test.isTrue(  topic.checkArchitecture([]) );
+        test.isTrue(  topic.checkArchitecture(["server"]) );
+        test.isTrue(  topic.checkArchitecture(["server", "client"]) );
+        test.isFalse( topic.checkArchitecture(["client"]) );
+        test.isFalse( topic.checkArchitecture(["web.browser"]) );
+        test.isFalse( topic.checkArchitecture(["web.cordova"]) );
+    }
+    
+    if(Meteor.isClient){
+        test.isTrue(  topic.checkArchitecture([]) );
+        test.isFalse( topic.checkArchitecture(["server"]) );
+        test.isTrue(  topic.checkArchitecture(["server", "client"]) );
+        test.isTrue(  topic.checkArchitecture(["web.browser"]) );
+        test.isFalse( topic.checkArchitecture(["web.cordova"]) );
+    }
+    
+    if(Meteor.isCordova){
+        test.isTrue(  topic.checkArchitecture([]) );
+        test.isFalse( topic.checkArchitecture(["server"]) );
+        test.isFalse( topic.checkArchitecture(["server", "client"]) );
+        test.isFalse( topic.checkArchitecture(["web.browser"]) );
+        test.isTrue(  topic.checkArchitecture(["web.cordova"]) );
+    }
+                 
 });
 
 Tinytest.add('PubSub - Topic Publishing', function(test){
-    SimpleSchema.debug = false; //Turn on if need to debug
+    var debug = false;
+    SimpleSchema.debug = debug;
     
     var topic = new PubSub.Topic(test.id);
     
@@ -85,7 +123,7 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
         var testCaseMessage = {};  
         var foundMessage = {};
         
-        topic.setSchema(testCase.schema || undefined);
+        topic.setSchema( testCase.schema ? new SimpleSchema(testCase.schema) : undefined);
         
         if(testCase.body)
             testCaseMessage.body = testCase.body;
@@ -94,6 +132,12 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
             try{
                 
                 testCaseMessage._id = topic.publish(testCaseMessage.body);
+                
+                if(testCaseMessage.body)
+                    test.isTrue( topic.matchesSelector(testCaseMessage, {'body.text': 'Hello World'}) );
+                else
+                    test.isFalse(topic.matchesSelector(testCaseMessage, {'body.text': 'Hello World'}) );
+                
                 foundMessage = topic.findOne(testCaseMessage._id);
                 
                 for(key in foundMessage.body)
@@ -101,7 +145,7 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
                 
             }
             catch(e){
-                console.log(e);
+                debug && console.log(e);
                 test.isTrue(false, "Should not see this. No error expected for [" + testCase.name + "]");
             }
         }
@@ -129,15 +173,22 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
     test.equal( topic.find().count(), _.filter(testCases, function(doc){ return doc.success; }).length );
 });
 
-Tinytest.addAsync('PubSub - Topic Subscribing', function(test, done){
+Tinytest.addAsync('PubSub - Topic Subscribing (No Selector, No Architecture)', function(test, done){
+    var debug = false;
+    SimpleSchema.debug = debug;
+    
     var topic = new PubSub.Topic(test.id);
     
     var testCases = _.clone(TEST_CASES);
     var receivedEvents = [];
     var expectedCalls = _.filter(testCases, function(doc){ return doc.success; }).length;
     
+    debug && console.log("expecting " + expectedCalls + " received events");
+    
     var subscriber = topic.subscribe(function(userId, message){
         receivedEvents.push(message);
+        
+        debug && console.log("received " + receivedEvents.length + " events");
         
         if(receivedEvents.length === expectedCalls){
             topic.unsubscribe(subscriber);
@@ -155,7 +206,7 @@ Tinytest.addAsync('PubSub - Topic Subscribing', function(test, done){
         var testCaseMessage = {};  
         var foundMessage = {};
         
-        topic.setSchema(testCase.schema || undefined);
+        topic.setSchema(testCase.schema ? new SimpleSchema(testCase.schema) : undefined);
         
         if(testCase.body)
             testCaseMessage.body = testCase.body;
@@ -168,5 +219,58 @@ Tinytest.addAsync('PubSub - Topic Subscribing', function(test, done){
     
 });
 
-//TODO Test subscription with selector
-//TODO Test subscription with architecture
+
+Tinytest.addAsync('PubSub - Topic Subscribing (With Selector, No Architecture)', function(test, done){
+    var debug = false;
+    SimpleSchema.debug = debug;
+    
+    var topic = new PubSub.Topic(test.id);
+    
+    var testCases = _.clone(TEST_CASES);
+    var receivedEvents = [];
+    var expectedCalls = _.filter(testCases, function(doc){ 
+        if(doc.body && doc.body.text)
+            return doc.body.text === "Hello World" && doc.success; 
+        else
+            return false;
+    }).length;
+    debug && console.log("expecting " + expectedCalls + " received events");
+    
+    var fn = function(userId, message){
+        receivedEvents.push(message);
+        
+        debug && console.log("received " + receivedEvents.length + " events");
+        
+        if(receivedEvents.length === expectedCalls){
+            topic.unsubscribe(subscriber);
+            test.equal(0, topic.getActiveSubscribers().count() );
+            done();
+        }
+    };
+    
+    var subscriber = topic.subscribe(fn, {'body.text': 'Hello World'});
+    
+    test.equal(1, topic.getActiveSubscribers().count() );
+    
+    for(i=0; i < testCases.length; i++){
+        
+        var testCase = testCases[i];
+        
+        var testCaseMessage = {};  
+        var foundMessage = {};
+        
+        topic.setSchema(testCase.schema ? new SimpleSchema(testCase.schema) : undefined);
+        
+        if(testCase.body)
+            testCaseMessage.body = testCase.body;
+        
+        try{
+            testCaseMessage._id = topic.publish(testCaseMessage.body);
+        }
+        catch(e){}
+    }
+    
+});
+
+
+

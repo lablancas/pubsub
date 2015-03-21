@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/lablancas/pubsub.svg)](https://travis-ci.org/lablancas/pubsub)
 
-# SUMMARY
+# Topics
 
 This package provides the capability of defining a Topic for publishing messages.
 
@@ -10,9 +10,6 @@ Topic's provide
 * the capability of publishing messages and validating their structure
 * the capability to define event handlers that are called when a message is published on the Topic
 
-
-# Topics
-
 ### new PubSub.Topic(name)
 Creates a new Topic to store messages under your chosen name. 
 
@@ -20,9 +17,25 @@ Creates a new Topic to store messages under your chosen name.
 *name* String
 The unique name you want to give to your topic for publishing messages
 
-### Topic.getChannel()
-Returns the channel (Mongo.Collection) for storing messages published on this Topic
+### Topic.matchesSelector(message, selector)
+Determines if a doc matches a selector. Returns true if matches; otherwise, false
 
+##### Arguments
+
+*message* Object
+The message document to check if it matches with the se
+
+*selector* Mongo Selector, Object ID, or String
+A query describing the message documents to find
+     
+### Topic.checkArchitecture(architecture)
+Determines if the current architecture matches. Returns true if matches, false otherwise.
+
+##### Arguments
+
+*architecture* [String]
+'server', 'client', 'web.browser', 'web.cordova'
+     
 ### Topic.getName()
 Returns the name assigned to this topic. This was provided into the constructor method
 
@@ -33,32 +46,19 @@ Returns the full name assigned to this topic. This was derived by the constructo
 Returns the current, active subscribers
 
 ### Topic.find(selector, options)
-See Mongo.Collection.find
-http://docs.meteor.com/#/full/find
+Returns a Mongo.Cursor containing the messages in this Topic that match your selector and options. (see http://docs.meteor.com/#/full/find)
 
 ### Topic.findOne(selector, options)
-See Mongo.Collection.find
-http://docs.meteor.com/#/full/findone
+Returns the first message object from this Topic matching your selector and options (see http://docs.meteor.com/#/full/findone)
 
 ### Topic.setSchema(schema)
 Sets the Message Body schema for this Topic. Returns void.
 
 *schema* Object
-The schema you want to use for the body of a message document. Follow the structure defined by SimpleSchema.
-
-See Collection2 and SimpleSchema
-
-https://atmospherejs.com/aldeed/collection2
-https://atmospherejs.com/aldeed/simple-schema
-
+The schema you want to use for the body of a message document. This object will be assigned as the type value of the message body so you can use a Javascript Object including a SimpleSchema Object (see https://github.com/aldeed/meteor-simple-schema#schema-rules).
 
 ### Topic.getSchema()
-Returns the SimpleSchema Object attached to this Topic.
-
-See Collection2 and SimpleSchema
-
-https://atmospherejs.com/aldeed/collection2
-https://atmospherejs.com/aldeed/simple-schema
+Returns the SimpleSchema Object attached to this Topic (see https://github.com/aldeed/meteor-collection2/#schema-format)
 
 ### Topic.publish(messageBody, callback)
 Publish a message on a topic. Returns its unique _id.
@@ -83,8 +83,6 @@ A query describing the documents to find
 
 *architecture* String
 If you only want to enable your subscription on the server (or the client), you can pass in the second argument (e.g., 'server', 'client', 'web.browser', 'web.cordova') to specify where the subscription is enabled.
-
-TODO add subscriber name/id as an input parameter?
 
 ### Topic.unsubscribe(subscriber)
 Removes a topic subscriber

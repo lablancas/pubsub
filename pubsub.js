@@ -7,17 +7,28 @@
 */
 
 PubSub = {
-    TopicPublishers  : new Mongo.Collection("pubsub.topic.publishers"),
-    TopicSubscribers : new Mongo.Collection("pubsub.topic.subscribers"),
-    Topics           : new Mongo.Collection("pubsub.topics"),
-    Messages         : new Mongo.Collection("pubsub.messages"),
-    
+    debug: false
 };
 
-MESSAGE_SCHEMA = {
+TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
+TopicSubscribers = new Mongo.Collection("pubsub.topic.subscribers");
+Topics           = new Mongo.Collection("pubsub.topics");
+Messages         = new Mongo.Collection("pubsub.messages");
+
+MessageSchema = {
+    
+    //Auto-generated Mongo document _id is used as the message ID
+    //_id:    { type: String }, 
+    
+    header: {
+        type: Object
+    },
+    
+
+    
     // Force value to be current date (on server) upon insert
     // and prevent updates thereafter.
-    createdAt: {
+    'header.createdAt': {
         type: Date,
         autoValue: function() {
             if (this.isInsert) {
@@ -29,8 +40,8 @@ MESSAGE_SCHEMA = {
             }
         }
     },
-    
-    createdBy: {
+
+    'header.createdBy': {
         type: String,
         autoValue: function() {
             if (this.isInsert) {
@@ -43,11 +54,30 @@ MESSAGE_SCHEMA = {
         }
     },
     
+    
+    //These header fields are set by the message publisher/sender
+    'header.expiresAt':     { type: Date,    optional: true }, // NOT IN USE: date the message expires.      
+    'header.priority':      { type: Number,  optional: true }, // NOT IN USE: priority of this message.      
+    'header.correlationID': { type: String,  optional: true }, // NOT IN USE: ID to correlate messages.       
+    'header.replyTo':       { type: String,  optional: true }, // NOT IN USE: Where to send message response.
+    'header.deliveryMode':  { type: Number,  optional: true }, // NOT IN USE: Need description.              
+    
+    //These header fields are set by this package
+    'header.destination':   { type: String,  optional: true }, //     IN USE: topic channel/collection name
+    'header.type':          { type: String,  optional: true }, //     IN USE: topic name (provided in constructor)
+    'header.redelivered':   { type: Boolean, optional: true }, // NOT IN USE: Need description.
+    
+    properties: {
+        type: Object,
+        optional: true,
+        blackbox: true
+    },
+    
     body: {
         type: Object,
         optional: true,
         blackbox: true
     }
     
-    //TODO add publishedTo [] to log subscriber IDs
+    
 };
