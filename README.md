@@ -14,6 +14,7 @@ Topic's provide
 #### new Topic(name)
 Creates a new Topic to store messages under your chosen name. 
 
+###### Arguments
 *name* String
 The unique name you want to give to your topic for publishing messages
 
