@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/lablancas/pubsub.svg)](https://travis-ci.org/lablancas/pubsub)
+
 # SUMMARY
 
 This package provides the capability of defining a Topic for publishing messages.
