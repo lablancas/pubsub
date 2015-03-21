@@ -33,7 +33,7 @@ TEST_CASES = [
 
 ];
 
-Tinytest.add('Messaging System - Topic Constructor', function(test){
+Tinytest.add('PubSub - Topic Constructor', function(test){
     var topic = new Topic(test.id);
     
     // PRIVATE variables and methods not accessible
@@ -71,7 +71,7 @@ Tinytest.add('Messaging System - Topic Constructor', function(test){
     
 });
 
-Tinytest.add('Messaging System - Topic Publishing', function(test){
+Tinytest.add('PubSub - Topic Publishing', function(test){
     SimpleSchema.debug = false; //Turn on if need to debug
     
     var topic = new Topic(test.id);
@@ -129,7 +129,7 @@ Tinytest.add('Messaging System - Topic Publishing', function(test){
     test.equal( topic.find().count(), _.filter(testCases, function(doc){ return doc.success; }).length );
 });
 
-Tinytest.addAsync('Messaging System - Topic Subscribing', function(test, done){
+Tinytest.addAsync('PubSub - Topic Subscribing', function(test, done){
     var topic = new Topic(test.id);
     
     var testCases = _.clone(TEST_CASES);
