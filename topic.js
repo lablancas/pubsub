@@ -6,12 +6,10 @@
 * To change this template use Tools | Templates.
 */
 
-TopicPublishers  = new Mongo.Collection("publishers");
-TopicSubscribers = new Mongo.Collection("subscribers");
-Topics           = new Mongo.Collection("topics");
-Messages         = new Mongo.Collection("messages");
 
-Topic = function(name){
+
+
+PubSub.Topic = function(name){
     
     var _self = this;
     
@@ -25,7 +23,7 @@ Topic = function(name){
     check(name, String);
     
     var _name = name;
-    var _fullname = "topic." + _name
+    var _fullname = "pubsub.topic." + _name
     var _channel = new Mongo.Collection(_fullname);
     var _subscriberFunctions = {};
     
@@ -137,7 +135,7 @@ Topic = function(name){
      * Returns the current, active subscribers
      */
     _self.getActiveSubscribers = function(){
-        return TopicSubscribers.find({topic: _fullname, stoppedAt: {$exists: false}});  
+        return PubSub.TopicSubscribers.find({topic: _fullname, stoppedAt: {$exists: false}});  
     };
     
     /**
@@ -167,6 +165,7 @@ Topic = function(name){
      * https://atmospherejs.com/aldeed/collection2
      * https://atmospherejs.com/aldeed/simple-schema
      * 
+     * TODO allow user to provide a SimpleSchema Object or Object
      */
     _self.setSchema = function(schema){
         check(schema, Match.Optional(Object));
@@ -237,7 +236,7 @@ Topic = function(name){
         check(architecture, Match.Optional(String));
         
         var subscriber = {topic: _fullname, selector: selector || {}, architecture: architecture || [], startedAt: new Date()};
-        subscriber._id = TopicSubscribers.insert(subscriber);
+        subscriber._id = PubSub.TopicSubscribers.insert(subscriber);
 
         _subscriberFunctions[subscriber._id] = fn;
 
@@ -259,7 +258,7 @@ Topic = function(name){
         check(subscriber.topic, String);
         
         if(subscriber.topic === _fullname){
-            TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
+            PubSub.TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
             delete _subscriberFunctions[subscriber._id];
         }
         else{
@@ -286,15 +285,4 @@ Topic = function(name){
     
 };
 
-//TODO ... need to think about how to migrate publish and subscribe methods into these objects... is this needed?
-
-TopicPublisher = function(topic){
-    var _topic = topic;
-
-};
-
-TopicSubscriber = function(topic){
-    var _topic = topic;
-    
-};
 

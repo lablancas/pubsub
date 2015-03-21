@@ -34,7 +34,7 @@ TEST_CASES = [
 ];
 
 Tinytest.add('PubSub - Topic Constructor', function(test){
-    var topic = new Topic(test.id);
+    var topic = new PubSub.Topic(test.id);
     
     // PRIVATE variables and methods not accessible
     test.isUndefined( topic._self );
@@ -67,14 +67,14 @@ Tinytest.add('PubSub - Topic Constructor', function(test){
     test.equal(0, topic.getActiveSubscribers().count() );
     
     test.equal(test.id, topic.getName());
-    test.equal("topic." + test.id, topic.getFullName());
+    test.equal("pubsub.topic." + test.id, topic.getFullName());
     
 });
 
 Tinytest.add('PubSub - Topic Publishing', function(test){
     SimpleSchema.debug = false; //Turn on if need to debug
     
-    var topic = new Topic(test.id);
+    var topic = new PubSub.Topic(test.id);
     
     var testCases = _.clone(TEST_CASES);
     
@@ -130,7 +130,7 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
 });
 
 Tinytest.addAsync('PubSub - Topic Subscribing', function(test, done){
-    var topic = new Topic(test.id);
+    var topic = new PubSub.Topic(test.id);
     
     var testCases = _.clone(TEST_CASES);
     var receivedEvents = [];
@@ -167,3 +167,6 @@ Tinytest.addAsync('PubSub - Topic Subscribing', function(test, done){
     }
     
 });
+
+//TODO Test subscription with selector
+//TODO Test subscription with architecture
