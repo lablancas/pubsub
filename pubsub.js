@@ -41,7 +41,7 @@ PubSub.getActiveSubscribers = function(topic){
                     stoppedAt: {$exists: false}}
     
     if(Match.test(topic, Topic))
-        selector.topic = topic.getFullName();
+        selector.topic = topic.getName();
     
     return TopicSubscribers.find(selector);  
 };
@@ -62,24 +62,19 @@ PubSub.getActiveSubscribers = function(topic){
   */
 PubSub.publish = function(topic, messageBody, callback){
     check(topic,       Topic);
-    check(messageBody, Match.Optional(Object)   );
     check(callback,    Match.Optional(Function) );
 
 
-    var message = { header: {createdAt: new Date(), 
-                             createdBy: 'placeholder', 
-                             destination: topic.getFullName(), 
-                             type: topic.getName() }
-                  };
+    var message = topic.createMessage(messageBody);
     
-    if( Match.test(messageBody, Object) )
-        message.body = _.clone(messageBody);
+    PubSub.debug && console.log("PubSub.publish -> " + JSON.stringify(message) );
 
-    var validator = topic.getSchema().newContext();
+    var validator = topic.validate(message);
     
-    //NOTE: would rather use topic.getSchema().clean(message), but doesn't work as documented
-    if(validator.validate(message))
+    if(validator.isValid()){
+        topic.getSchema().clean(message);
         return Messages.insert(message, callback);
+    }
     else
         throw validator.getErrorObject(); 
 };
@@ -104,8 +99,7 @@ PubSub.subscribe = function(topic, fn, selector){
     check(fn,           Function);
     check(selector,     Match.Optional(Object));
 
-    var subscriber = {topic: topic.getFullName(), 
-                      startedAt: new Date(),
+    var subscriber = {topic: topic.getName(), 
                       server: Meteor.isServer,
                       client: Meteor.isClient,
                       cordova: Meteor.isCordova
@@ -115,11 +109,24 @@ PubSub.subscribe = function(topic, fn, selector){
         subscriber.selector = JSON.stringify(selector);
     
     subscriber._id = TopicSubscribers.insert(subscriber);
-
     SubscriberFunctions[subscriber._id] = fn;
 
-    PubSub.debug && console.log("Adding subscriber " + subscriber._id);
-    PubSub.debug && console.log(subscriber);
+    /* This didn't work
+    SubscriberFunctions[subscriber._id] = function(userId, message){
+        
+        var validator = topic.validate(message)
+        
+        if(validator.isValid())
+            fn(userId, message);
+        
+        else {
+            PubSub.debug && console.log( "TopicSubscriber " + JSON.stringify(subscriber) + " receiving invalid message format " + JSON.stringify(message) );
+            PubSub.debug && console.log( validator.getErrorObject() );
+        }
+    }
+    */
+    
+    PubSub.debug && console.log("PubSub.subscribe -> " + JSON.stringify(subscriber) );
     
     return subscriber;
 
@@ -141,8 +148,7 @@ PubSub.unsubscribe = function(subscriber){
     TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
     delete SubscriberFunctions[subscriber._id];
     
-    PubSub.debug && console.log("Deleted subscriber " + subscriber._id);
-    PubSub.debug && console.log(subscriber);
+    PubSub.debug && console.log("PubSub.unsubscribe -> " + JSON.stringify(subscriber) );
     
 };
 

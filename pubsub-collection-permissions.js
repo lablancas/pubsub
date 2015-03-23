@@ -7,13 +7,21 @@
 */
 
 Messages.allow({
-    insert: function(){ return true; },
-    update: function(){ return true; },
-    remove: function(){ return true; }
+    insert: function(userId, doc){ 
+        return userId === doc.header.createdBy; 
+    },
+    fetch: ['header.createdBy']
+});
+
+Topics.allow({
+    insert: function(userId, doc){ 
+        return userId === doc.createdBy; 
+    },
+    fetch: ['createdBy']
 });
 
 TopicSubscribers.allow({
-    insert: function(){ return true; },
-    update: function(){ return true; },
-    remove: function(){ return true; }
+    insert: function(userId, doc){ return userId === doc.startedBy; },
+    update: function(userId, doc){ return userId === doc.startedBy; },
+    fetch: ['startedBy']
 });

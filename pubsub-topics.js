@@ -19,9 +19,17 @@ Topic = function(name){
     
     check(name, String);
     
-    var _name = name;
-    var _fullname = "pubsub.topic." + _name;
-    var _schema;
+    var _topic = Topics.findOne({name: name});
+    
+    if(Match.test(_topic, undefined)){
+        _topic = {
+            name: name,
+            schema: JSON.stringify(MessageSchema)
+        };
+        
+        _topic._id = Topics.insert(_topic);
+    }
+    
     
     /*****************************************************************************************************
      * 
@@ -34,26 +42,24 @@ Topic = function(name){
      * Returns the name assigned to this topic. This was provided into the constructor method
      */
     _self.getName = function(){
-        return _name;  
+        return _topic.name;  
     };
-    
-    /**
-     * Returns the full name assigned to this topic. This was derived by the constructor based on the provided name.
-     */
-    _self.getFullName = function(){
-        return _fullname;  
-    };
-
     
     /**
      * See Mongo.Collection.find
      * http://docs.meteor.com/#/full/find
      */
     _self.find = function(selector, options){
-        var s = { $and: [{'header.destination': _self.getFullName()}] };
+        check(selector, Match.OneOf(Object, String, undefined));
+        check(options, Match.OneOf(Object, undefined));
+        
+        var s = { $and: [{'header.destination': _self.getName()}] };
         
         if( Match.test(selector, Object) )
             s.$and.push(selector);
+        
+        else if ( Match.test(selector, String) )
+            s.$and.push({_id: selector});
         
         return Messages.find(s, options);
     };
@@ -63,12 +69,18 @@ Topic = function(name){
      * http://docs.meteor.com/#/full/findone
      */
     _self.findOne = function(selector, options){
-        var s = { $and: [{'header.destination': _self.getFullName()}] };
+        check(selector, Match.OneOf(Object, String, undefined));
+        check(options, Match.OneOf(Object, undefined));
+        
+        var s = { $and: [{'header.destination': _self.getName()}] };
         
         if( Match.test(selector, Object) )
             s.$and.push(selector);
         
-        return Messages.findOne(s, options); 
+        else if ( Match.test(selector, String) )
+            s.$and.push({_id: selector});
+        
+        return Messages.findOne(s, options);
     };
     
     /**
@@ -87,12 +99,15 @@ Topic = function(name){
      * 
      */
     _self.setSchema = function(schema){
+        check(schema, Match.Optional(SimpleSchema));
         var messageSchema = _.clone(MessageSchema);
 
-        if( !Match.test(schema, undefined) )
+        if( Match.test(schema, SimpleSchema) )
             messageSchema.body = {type: schema};
-  
-        _schema = new SimpleSchema(messageSchema);
+        
+        PubSub.debug && console.log("Topic.setSchema -> " + JSON.stringify(messageSchema) );
+        
+        _topic.schema = new SimpleSchema( messageSchema );
     };
     
     /**
@@ -105,20 +120,58 @@ Topic = function(name){
      * 
      */
     _self.getSchema = function(){
-        return _schema;
+        return _topic.schema;
     };
     
     
-    /*****************************************************************************************************
+     
+    /**
+     * Creates a message object for you to publish and/or validate.
      * 
-     * Constructor
+     * Arguments:
      * 
+     * messageBody Object
+     * The body of the message you would like to publish.
      * 
      */
+    _self.createMessage = function(messageBody){
+        check(messageBody, Match.Optional(Object));
+
+        var message = { header: {createdAt: new Date(), 
+                                 createdBy: 'placeholder', 
+                                 destination: _self.getName()
+                                }
+                      };
+
+        if( Match.test(messageBody, Object) )
+            message.body = _.clone(messageBody);
+
+        return message;
+    }
     
-    // set default message schema
+    /**
+     * Checks if your message is valid and returns a Simple Schema Validation Context after the message has been validated
+     * 
+     * Arguments:
+     * 
+     * message Object
+     * The message you would like to publish. See Topic.createMessage
+     * 
+     */
+    _self.validate = function(message){
+        check(message, Object);
+        var validator = _self.getSchema().newContext();
+        
+        validator.validate(message);
+
+        return validator;
+    };
+    
+    
+    /**
+     * Constructor
+     */
     _self.setSchema();
-    
 };
 
 

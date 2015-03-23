@@ -10,10 +10,23 @@ TEST_CASES = [
     {name: 'NO   message schema & NO   message body = SUCCESS', 
      success: true},
 
-    {name: 'NO message schema & WITH message body & VALID message body schema = SUCCESS',
+    {name: 'NO message schema & WITH message body = SUCCESS',
      body: {text: 'Hello World'}, success: true},
     
-    {name: 'WITH message schema & WITH message body & VALID message body schema = SUCCESS',
+    /*
+     * FIXME issue where cannot specify message body schema type as primitive javascript object (e.g. String, Number, Date) 
+     * 
+    {name: 'WITH message schema & WITH message body (String) & VALID message body schema = SUCCESS',
+     schema: String, body: 'Live Testing of Body as a String', success: true},
+    
+    {name: 'WITH message schema & WITH message body (Number) & VALID message body schema = SUCCESS',
+     schema: Number, body: 12345, success: true},
+    
+    {name: 'WITH message schema & WITH message body (Date) & VALID message body schema = SUCCESS',
+     schema: Date, body: new Date(), success: true},
+    */
+    
+    {name: 'WITH message schema & WITH message body (Object) & VALID message body schema = SUCCESS',
      schema: {text: {type: String}}, body: {text: 'Hello World'}, success: true},
 
     {name: 'WITH message schema & WITH message body & extra property = ERROR',
@@ -36,6 +49,7 @@ TEST_CASES = [
 cleanup = function(){
     Messages.find().forEach(function(msg){ Messages.remove(msg._id); });
     TopicSubscribers.find().forEach(PubSub.unsubscribe);
+    Topics.find().forEach(function(doc){ Topics.remove(doc._id); });
 };
 
 Tinytest.add('PubSub - Validate Exported Objects', function(test){
@@ -68,7 +82,6 @@ Tinytest.add('PubSub - Topic Constructor', function(test){
     
     // PUBLIC methods are accessible and functions
     test.isTrue( _.isFunction(topic.getName),               "Get Name should be a public function"  );
-    test.isTrue( _.isFunction(topic.getFullName),           "Get Full Name should be a public function"  );
     
     test.isTrue( _.isFunction(topic.find),                  "Find should be a public function"  );
     test.isTrue( _.isFunction(topic.findOne),               "Find One should be a public function"  );
@@ -81,13 +94,6 @@ Tinytest.add('PubSub - Topic Constructor', function(test){
     test.equal(name, "changed");
     test.equal(topic.getName(), test.id, "Topic Name should be unchanged");
     
-    
-    test.equal(topic.getFullName(), "pubsub.topic." + test.id, "Topic Full Name should match");
-    var fullname = topic.getFullName();
-    fullname = "changed";
-    test.equal(fullname, "changed");
-    test.equal(topic.getFullName(), "pubsub.topic." + test.id, "Topic Full Name should be unchanged");
-       
     cleanup();
 });
 
@@ -98,39 +104,42 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
     
     var topic = PubSub.createTopic(test.id);
     
+    debug && console.log( Topics.findOne({name: test.id}) );
+    
     var testCases = _.clone(TEST_CASES);
     
     for(i=0; i < testCases.length; i++){
-        
+        var testCaseLogPrefix = "Test Case #" + i + ": ";
         var testCase = testCases[i];
         
         var testCaseMessage = {};  
         var foundMessage = {};
         
-        topic.setSchema( testCase.schema ? new SimpleSchema(testCase.schema) : undefined);
+        topic.setSchema( Match.test(testCase.schema, Object) ? new SimpleSchema(testCase.schema) : testCase.schema);
         
         if(testCase.body)
             testCaseMessage.body = testCase.body;
 
         if(testCase.success){
             try{
+                debug && console.log(testCaseLogPrefix + "before publishing: " + JSON.stringify(testCaseMessage) );
                 
                 testCaseMessage._id = PubSub.publish(topic, testCaseMessage.body);
                 
-                if(testCaseMessage.body)
+                if(testCaseMessage.body && testCaseMessage.body.text)
                     test.isTrue( PubSub.matchesSelector(testCaseMessage, {'body.text': 'Hello World'}) );
-                else
-                    test.isFalse(PubSub.matchesSelector(testCaseMessage, {'body.text': 'Hello World'}) );
+                
+                debug && console.log(testCaseLogPrefix + "after publishing: " + JSON.stringify(testCaseMessage) );
+                
                 
                 foundMessage = topic.findOne(testCaseMessage._id);
-                
-                for(key in foundMessage.body)
-                    test.equal(foundMessage.body[key], testCaseMessage.body[key], "Expected values to match for key " + key);
+                debug && console.log(testCaseLogPrefix + "foundMessage -> " + JSON.stringify(foundMessage) );
+                test.equal(foundMessage.body, testCaseMessage.body, testCaseLogPrefix + "Expected body of messages to match");
                 
             }
             catch(e){
                 debug && console.log(e);
-                test.isTrue(false, "Should not see this. No error expected for [" + testCase.name + "]");
+                test.isTrue(false, testCaseLogPrefix + "Should not see this. No error expected for [" + testCase.name + "]");
             }
         }
         
@@ -142,11 +151,11 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
                 if(Meteor.isClient){
                     foundMessage = topic.findOne(testCaseMessage._id);
                     console.log(topic.getSchema());
-                    test.isUndefined(foundMessage, "Should not see this. Failed insert expected for [" + testCase.name + "]");
+                    test.isUndefined(foundMessage, testCaseLogPrefix + "Should not see this. Failed insert expected for [" + testCase.name + "]");
                 }
                     
                 else
-                    test.isTrue(false, "Should not see this. Error expected for [" + testCase.name + "]");
+                    test.isTrue(false, testCaseLogPrefix + "Should not see this. Error expected for [" + testCase.name + "]");
             }
             catch(e){
                 test.isUndefined(testCaseMessage._id);
@@ -155,12 +164,12 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
         
     }
     
-    test.equal( _.filter(testCases, function(doc){ return doc.success; }).length, topic.find().count() );
+    test.equal( topic.find().count(), _.filter(testCases, function(doc){ return doc.success; }).length );
     
     cleanup();
 });
 
-Tinytest.addAsync('PubSub - Topic Subscribing (No Selector, No Architecture)', function(test, done){
+Tinytest.addAsync('PubSub - Topic Subscribing (No Selector)', function(test, done){
     var debug = false;
     PubSub.debug = debug;
     SimpleSchema.debug = debug;
@@ -194,7 +203,7 @@ Tinytest.addAsync('PubSub - Topic Subscribing (No Selector, No Architecture)', f
         var testCaseMessage = {};  
         var foundMessage = {};
         
-        topic.setSchema(testCase.schema ? new SimpleSchema(testCase.schema) : undefined);
+        topic.setSchema( Match.test(testCase.schema, Object) ? new SimpleSchema(testCase.schema) : testCase.schema);
         
         if(testCase.body)
             testCaseMessage.body = testCase.body;
@@ -208,7 +217,7 @@ Tinytest.addAsync('PubSub - Topic Subscribing (No Selector, No Architecture)', f
 });
 
 
-Tinytest.addAsync('PubSub - Topic Subscribing (With Selector, No Architecture)', function(test, done){
+Tinytest.addAsync('PubSub - Topic Subscribing (With Selector)', function(test, done){
     var debug = false;
     PubSub.debug = debug;
     SimpleSchema.debug = debug;
@@ -247,7 +256,7 @@ Tinytest.addAsync('PubSub - Topic Subscribing (With Selector, No Architecture)',
         var testCaseMessage = {};  
         var foundMessage = {};
         
-        topic.setSchema(testCase.schema ? new SimpleSchema(testCase.schema) : undefined);
+        topic.setSchema( Match.test(testCase.schema, Object) ? new SimpleSchema(testCase.schema) : testCase.schema);
         
         if(testCase.body)
             testCaseMessage.body = testCase.body;

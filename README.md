@@ -72,12 +72,10 @@ A query describing the message documents to find
 
 
 ## Topics
+Topics are created using PubSub.createTopic method above
 
 ### Topic.getName()
 Returns the name assigned to this topic. This was provided into the constructor method
-
-### Topic.getFullName()
-Returns the full name assigned to this topic. This was derived by the constructor based on the provided name.
 
 ### Topic.find(selector, options)
 Returns a Mongo.Cursor containing the messages in this Topic that match your selector and options. (see http://docs.meteor.com/#/full/find)
@@ -94,3 +92,19 @@ The schema you want to use for the body of a message document. This object will 
 
 ### Topic.getSchema()
 Returns the SimpleSchema Object attached to this Topic (see https://github.com/aldeed/meteor-collection2/#schema-format)
+
+### Topic.createMessage(messageBody)
+Creates a message object for you to publish and/or validate.
+
+##### Arguments
+
+*messageBody* Object
+The body of the message you would like to publish.
+
+### Topic.validate(message)
+Checks if your message is valid and returns a Simple Schema Validation Context after the message has been validated
+
+##### Arguments
+
+*message* Object
+The message you would like to publish. See Topic.createMessage

@@ -7,13 +7,20 @@
 */
 
 Topics           = new Mongo.Collection("pubsub.topics");
+Topics.attachSchema(TopicSchema);
+delete Topics.attachSchema;
 
 TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
 
 TopicSubscribers = new Mongo.Collection("pubsub.topic.subscribers");
+TopicSubscribers.attachSchema(new SimpleSchema(TopicSubscriberSchema));
+delete TopicSubscribers.attachSchema;
+
 SubscriberFunctions = [];
 
 Messages         = new Mongo.Collection("pubsub.messages");
+Messages.attachSchema(new SimpleSchema(MessageSchema));
+delete Messages.attachSchema;
 
 /**
  * Publishes a message to all subscribers based on each subscribers selector and architecture.

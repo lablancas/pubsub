@@ -1,6 +1,6 @@
 Package.describe({
     name: 'lablancas:pubsub',
-    version: '0.0.7',
+    version: '0.0.8',
     // Brief, one-line summary of the package.
     summary: 'A publish/subscribe messaging package designed for Meteor',
     // URL to the Git repository containing the source code for this package.
@@ -18,15 +18,18 @@ Package.onUse(function(api) {
     
     api.use('aldeed:collection2@2.1.0');
     api.use('matb33:collection-hooks@0.7.6');
+    api.use('msavin:mongol@1.0.5');
 
     api.addFiles('pubsub-schemas.js');
     api.addFiles('pubsub-topics.js');
     api.addFiles('pubsub-collections.js');
+    api.addFiles('pubsub-collection-permissions.js');
     api.addFiles('pubsub.js');
     
     api.export('PubSub');
-    api.export('Messages', {testOnly: true});
-    api.export('TopicSubscribers', {testOnly: true});
+    api.export('Messages');
+    api.export('Topics');
+    api.export('TopicSubscribers');
 });
 
 Package.onTest(function(api) {
@@ -36,6 +39,6 @@ Package.onTest(function(api) {
     
     api.use('aldeed:simple-schema@1.0.3');
     
+    api.addFiles('pubsub-collection-permissions-test.js');
     api.addFiles('pubsub-tests.js');
-    api.addFiles('pubsub-collection-permissions.js');
 });
