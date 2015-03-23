@@ -32,7 +32,7 @@ The body of the message to publish. May not yet have an _id attribute, in which 
 *callback* Function
 Optional. If present, called with an error object as the first argument and, if no error, the _id as the second.
 
-### PubSub.subscribe(topic, fn, selector, architecture)    
+### PubSub.subscribe(topic, fn, selector)    
 Creates a topic subscriber which calls the function defined by the caller. Returns a Subscriber Object.
 
 ##### Arguments
@@ -44,9 +44,6 @@ Function to call when a message is created on this topic. Called with a userId a
 
 *selector* Mongo Selector, Object ID, or String
 A query describing the documents to find
-
-*architecture* String
-If you only want to enable your subscription on the server (or the client), you can pass in the second argument (e.g., 'server', 'client', 'web.browser', 'web.cordova') to specify where the subscription is enabled.
 
 ### PubSub.unsubscribe(subscriber)
 Removes a topic subscriber
