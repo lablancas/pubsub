@@ -1,6 +1,6 @@
 Package.describe({
     name: 'lablancas:pubsub',
-    version: '0.0.8',
+    version: '0.0.9',
     // Brief, one-line summary of the package.
     summary: 'A publish/subscribe messaging package designed for Meteor',
     // URL to the Git repository containing the source code for this package.
@@ -20,6 +20,7 @@ Package.onUse(function(api) {
     api.use('matb33:collection-hooks@0.7.6');
     api.use('msavin:mongol@1.0.5');
 
+    api.addFiles('pubsub-namespace.js');
     api.addFiles('pubsub-schemas.js');
     api.addFiles('pubsub-topics.js');
     api.addFiles('pubsub-collections.js');
@@ -27,7 +28,6 @@ Package.onUse(function(api) {
     api.addFiles('pubsub.js');
     
     api.export('PubSub');
-    api.export('Collections');
 });
 
 Package.onTest(function(api) {

@@ -7,12 +7,12 @@
  */
 
 /**
- * A static class for storing Mongo Collections
+ * A static class for storing Mongo PubSub.Collections
  * 
- * @class Collections
+ * @class PubSub.Collections
  * @static
  */
-Collections = {};
+PubSub.Collections = {};
 
 /**
  * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topics
@@ -20,9 +20,9 @@ Collections = {};
  * @property Topics
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.Topics           = new Mongo.Collection("pubsub.topics");
-Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
-delete Collections.Topics.attachSchema;
+PubSub.Collections.Topics           = new Mongo.Collection("pubsub.topics");
+PubSub.Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
+delete PubSub.Collections.Topics.attachSchema;
 
 /**
  * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topics
@@ -30,7 +30,7 @@ delete Collections.Topics.attachSchema;
  * @property TopicPublishers
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
+PubSub.Collections.TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
 
 /**
  * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topic Subscribers
@@ -38,9 +38,9 @@ Collections.TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
  * @property TopicSubscribers
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.TopicSubscribers = new Mongo.Collection("pubsub.topic.subscribers");
-Collections.TopicSubscribers.attachSchema(new SimpleSchema(Schemas.TopicSubscriber));
-delete Collections.TopicSubscribers.attachSchema;
+PubSub.Collections.TopicSubscribers = new Mongo.Collection("pubsub.topic.subscribers");
+PubSub.Collections.TopicSubscribers.attachSchema(new SimpleSchema(Schemas.TopicSubscriber));
+delete PubSub.Collections.TopicSubscribers.attachSchema;
 
 /**
  * An Array for storing Functions belonging to a TopicSubscriber
@@ -48,7 +48,7 @@ delete Collections.TopicSubscribers.attachSchema;
  * @property SubscriberFunctions
  * @type     Array
  */
-Collections.SubscriberFunctions = [];
+PubSub.Collections.SubscriberFunctions = [];
 
 /**
  * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Messages
@@ -56,9 +56,9 @@ Collections.SubscriberFunctions = [];
  * @property Messages
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.Messages         = new Mongo.Collection("pubsub.messages");
-Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
-delete Collections.Messages.attachSchema;
+PubSub.Collections.Messages         = new Mongo.Collection("pubsub.messages");
+PubSub.Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
+delete PubSub.Collections.Messages.attachSchema;
 
 /**
  * Publishes a message to all subscribers based on each subscribers selector and architecture.
@@ -68,7 +68,7 @@ delete Collections.Messages.attachSchema;
  * @param message {Object} The message document to publish to subscribers
  * 
  */
-Collections.Messages.after.insert(function(userId, message){
+PubSub.Collections.Messages.after.insert(function(userId, message){
     check(userId,  Match.Optional(String) );
     check(message, Object);
 
@@ -82,7 +82,7 @@ Collections.Messages.after.insert(function(userId, message){
         if( Match.test(subscriber.selector, String) ) 
             selector = JSON.parse(subscriber.selector);
         
-        var fn = Collections.SubscriberFunctions[subscriber._id];
+        var fn = PubSub.Collections.SubscriberFunctions[subscriber._id];
         
         PubSub.debug && console.log("subscriber " + subscriber._id);
         PubSub.debug && console.log("    matches selector -> " + PubSub.matchesSelector(message, selector));

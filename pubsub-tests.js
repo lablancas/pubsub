@@ -47,9 +47,9 @@ TEST_CASES = [
 ];
 
 cleanup = function(){
-    Collections.Messages.find().forEach(function(msg){ Collections.Messages.remove(msg._id); });
-    Collections.TopicSubscribers.find().forEach(PubSub.unsubscribe);
-    Collections.Topics.find().forEach(function(doc){ Collections.Topics.remove(doc._id); });
+    PubSub.Collections.Messages.find().forEach(function(msg){ PubSub.Collections.Messages.remove(msg._id); });
+    PubSub.Collections.TopicSubscribers.find().forEach(PubSub.unsubscribe);
+    PubSub.Collections.Topics.find().forEach(function(doc){ PubSub.Collections.Topics.remove(doc._id); });
 };
 
 Tinytest.add('PubSub - Validate Exported Objects', function(test){

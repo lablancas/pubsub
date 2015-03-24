@@ -34,7 +34,7 @@ Topic = function(name){
      * @type Object
      * @private
      */
-    var _topic = Collections.Topics.findOne({name: name});
+    var _topic = PubSub.Collections.Topics.findOne({name: name});
     
     if(Match.test(_topic, undefined)){
         _topic = {
@@ -42,7 +42,7 @@ Topic = function(name){
             schema: JSON.stringify(Schemas.Message)
         };
         
-        _topic._id = Collections.Topics.insert(_topic);
+        _topic._id = PubSub.Collections.Topics.insert(_topic);
     }
     
     /*****************************************************************************************************
@@ -82,7 +82,7 @@ Topic = function(name){
         else if ( Match.test(selector, String) )
             s.$and.push({_id: selector});
         
-        return Collections.Messages.find(s, options);
+        return PubSub.Collections.Messages.find(s, options);
     };
     
     /**
@@ -105,7 +105,7 @@ Topic = function(name){
         else if ( Match.test(selector, String) )
             s.$and.push({_id: selector});
         
-        return Collections.Messages.findOne(s, options);
+        return PubSub.Collections.Messages.findOne(s, options);
     };
     
     /**

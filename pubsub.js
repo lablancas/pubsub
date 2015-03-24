@@ -6,23 +6,6 @@
  * To change this template use Tools | Templates.
  */
 
- /** 
-  * The Static Class containing the primary Publish/Subscribe functions and properties
-  * 
-  * @class PubSub
-  * @static
-  */ 
-PubSub = {
-    
-    /**
-     * Used to disable/enable debug logging output
-     * 
-     * @property debug {Boolean}
-     */
-    debug: false
-};
-
-
 /**
  * Creates a {{#crossLink "Topic"}}{{/crossLink}} Object 
  * 
@@ -53,7 +36,7 @@ PubSub.getActiveSubscribers = function(topic){
     if(Match.test(topic, Topic))
         selector.topic = topic.getName();
     
-    return Collections.TopicSubscribers.find(selector);  
+    return PubSub.Collections.TopicSubscribers.find(selector);  
 };
 
 /**
@@ -81,7 +64,7 @@ PubSub.publish = function(topic, messageBody, callback){
     
     if(validator.isValid()){
         topic.getSchema().clean(message);
-        return Collections.Messages.insert(message, callback);
+        return PubSub.Collections.Messages.insert(message, callback);
     }
     else
         throw validator.getErrorObject(); 
@@ -111,8 +94,8 @@ PubSub.subscribe = function(topic, fn, selector){
     if( Match.test(selector, Object) )
         subscriber.selector = JSON.stringify(selector);
     
-    subscriber._id = Collections.TopicSubscribers.insert(subscriber);
-    Collections.SubscriberFunctions[subscriber._id] = fn;
+    subscriber._id = PubSub.Collections.TopicSubscribers.insert(subscriber);
+    PubSub.Collections.SubscriberFunctions[subscriber._id] = fn;
 
     /* This didn't work
     SubscriberFunctions[subscriber._id] = function(userId, message){
@@ -147,8 +130,8 @@ PubSub.unsubscribe = function(subscriber){
     check(subscriber._id,   String);
     check(subscriber.topic, String);
 
-    Collections.TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
-    delete Collections.SubscriberFunctions[subscriber._id];
+    PubSub.Collections.TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
+    delete PubSub.Collections.SubscriberFunctions[subscriber._id];
     
     PubSub.debug && console.log("PubSub.unsubscribe -> " + JSON.stringify(subscriber) );
     
@@ -177,6 +160,6 @@ PubSub.matchesSelector = function(message, selector){
     if( Match.test(selector, Object) )
         s.$and.push(selector);
 
-    return Match.test( Collections.Messages.findOne(s), Object );
+    return Match.test( PubSub.Collections.Messages.findOne(s), Object );
 };
 

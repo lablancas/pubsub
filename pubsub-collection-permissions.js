@@ -6,7 +6,7 @@
  * To change this template use Tools | Templates.
  */
 
-Collections.Messages.allow({
+PubSub.Collections.Messages.allow({
     insert: function(userId, doc){ 
         var allowed = userId === doc.header.createdBy; 
         PubSub.debug && !allowed && console.log("insert message failed for user " + userId + " " + JSON.stringify(doc))
@@ -15,7 +15,7 @@ Collections.Messages.allow({
     fetch: ['header.createdBy']
 });
 
-Collections.Topics.allow({
+PubSub.Collections.Topics.allow({
     insert: function(userId, doc){ 
         var allowed = userId === doc.createdBy; 
         PubSub.debug && !allowed && console.log("insert topic failed for user " + userId + " " + JSON.stringify(doc))
@@ -24,7 +24,7 @@ Collections.Topics.allow({
     fetch: ['createdBy']
 });
 
-Collections.TopicSubscribers.allow({
+PubSub.Collections.TopicSubscribers.allow({
     insert: function(userId, doc){ 
         var allowed = userId === doc.startedBy; 
         PubSub.debug && !allowed && console.log("insert topic subscriber failed for user " + userId + " " + JSON.stringify(doc))
