@@ -1,36 +1,46 @@
-/**
-* Created with MakeItHappen.
-* User: lablancas
-* Date: 2015-03-21
-* Time: 02:58 PM
-* To change this template use Tools | Templates.
-*/
+/*
+ * Created with MakeItHappen.
+ * User: lablancas
+ * Date: 2015-03-21
+ * Time: 02:58 PM
+ * To change this template use Tools | Templates.
+ */
 
-/** 
-  * This package provides the capability of defining a Topic for publishing messages.
+ /** 
+  * The Static Class containing the primary Publish/Subscribe functions and properties
   * 
-  * A message can be an unstructure or structure JSON document.  You decide for each Topic.
-  * 
-  * A Topic provides
-  *   > the capability of publishing messages and validating their structure
-  *   > the capability to define event handlers that are called when a message is published on the Topic
+  * @class PubSub
+  * @static
   */ 
 PubSub = {
+    
+    /**
+     * Used to disable/enable debug logging output
+     * 
+     * @property debug {Boolean}
+     */
     debug: false
 };
 
 
+/**
+ * Creates a {{#crossLink "Topic"}}{{/crossLink}} Object 
+ * 
+ * @method createTopic
+ * @param name {String} name to assign to the created {{#crossLink "Topic"}}{{/crossLink}}
+ * @return {Topic} the created {{#crossLink "Topic"}}{{/crossLink}}
+ * 
+ */
 PubSub.createTopic = function(name){
     return new Topic(name);
 };
 
-/**
- * Returns the current, active subscribers
- * 
-  * Arguments:
+ /**
+  * Returns the current, active subscribers
   * 
-  * topic Topic
-  * Optional. Used to filter Active Subscribers based on Topic
+  * @method getActiveSubscribers
+  * @param topic {Topic} [Optional] Used to filter Active Subscribers based on a {{#crossLink "Topic"}}{{/crossLink}}
+  * @return <a href="http://docs.meteor.com/#/full/mongo_cursor">Mongo.Cursor</a> A cursor object containing the Topic Subscribers of a {{#crossLink "Topic"}}{{/crossLink}} or all Topics
  */
 PubSub.getActiveSubscribers = function(topic){
     check(topic, Match.Optional(Topic));
@@ -43,22 +53,20 @@ PubSub.getActiveSubscribers = function(topic){
     if(Match.test(topic, Topic))
         selector.topic = topic.getName();
     
-    return TopicSubscribers.find(selector);  
+    return Collections.TopicSubscribers.find(selector);  
 };
 
 /**
-  * Publish a message on a topic. Returns its unique _id.
+  * Publish a message on a {{#crossLink "Topic"}}{{/crossLink}}
   * 
-  * Arguments:
+  * @method publish
+  * @param topic {Topic} Used to define the Topic where you want to publish your message
+  * @param messageBody {Object} The body of the message to publish. May not yet have an _id attribute, in which case Meteor will generate one for you.
+  * @param callback {Function} [Optional] If present, called with an error object as the first argument and, if no error, the _id as the second.
+  * @return {String} the unique ID assigned to your published message if successful
   * 
-  * topic Topic
-  * Used to define the Topic where you want to publish your message
+  * @throws {Error} an object containing the errors found when your message was validated
   * 
-  * messageBody Object
-  * The body of the message to publish. May not yet have an _id attribute, in which case Meteor will generate one for you.
-  * 
-  * callback Function
-  * Optional. If present, called with an error object as the first argument and, if no error, the _id as the second.
   */
 PubSub.publish = function(topic, messageBody, callback){
     check(topic,       Topic);
@@ -73,7 +81,7 @@ PubSub.publish = function(topic, messageBody, callback){
     
     if(validator.isValid()){
         topic.getSchema().clean(message);
-        return Messages.insert(message, callback);
+        return Collections.Messages.insert(message, callback);
     }
     else
         throw validator.getErrorObject(); 
@@ -82,17 +90,12 @@ PubSub.publish = function(topic, messageBody, callback){
 /**
   * Creates a topic subscriber which calls the function defined by the caller. Returns a Subscriber Object.
   * 
-  * Arguments:
+  * @method subscribe
+  * @param topic {Topic} Used to define the Topic where you want to subscribe for messages
+  * @param fn {Function} Function to call when a message is created on this topic. Called with a userId as the first argument and the message as the second.
+  * @param selector {Object} [Optional] A Mongo Selector used to check the contents of a message to determine if it should be passed to your Function
   * 
-  * topic Topic
-  * Used to define the Topic where you want to subscribe for messages
-  * 
-  * fn Function
-  * Function to call when a message is created on this topic. Called with a userId as the first argument and the message as the second.
-  * 
-  * selector Mongo Selector, Object ID, or String
-  * A query describing the documents to find
-  * 
+  * @return {Object} A Topic Subscriber Object
   */
 PubSub.subscribe = function(topic, fn, selector){
     check(topic,        Topic);
@@ -108,8 +111,8 @@ PubSub.subscribe = function(topic, fn, selector){
     if( Match.test(selector, Object) )
         subscriber.selector = JSON.stringify(selector);
     
-    subscriber._id = TopicSubscribers.insert(subscriber);
-    SubscriberFunctions[subscriber._id] = fn;
+    subscriber._id = Collections.TopicSubscribers.insert(subscriber);
+    Collections.SubscriberFunctions[subscriber._id] = fn;
 
     /* This didn't work
     SubscriberFunctions[subscriber._id] = function(userId, message){
@@ -135,9 +138,8 @@ PubSub.subscribe = function(topic, fn, selector){
 /**
   * Removes a topic subscriber
   * 
-  * Arguments:
-  * subscriber Object
-  * The object returned from calling subscribe
+  * @method unsubscribe
+  * @param subscriber {Object} The object returned from calling {{#crossLink "PubSub/subscribe:method"}}{{/crossLink}}
   * 
   */
 PubSub.unsubscribe = function(subscriber){
@@ -145,8 +147,8 @@ PubSub.unsubscribe = function(subscriber){
     check(subscriber._id,   String);
     check(subscriber.topic, String);
 
-    TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
-    delete SubscriberFunctions[subscriber._id];
+    Collections.TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
+    delete Collections.SubscriberFunctions[subscriber._id];
     
     PubSub.debug && console.log("PubSub.unsubscribe -> " + JSON.stringify(subscriber) );
     
@@ -159,14 +161,11 @@ PubSub.getActiveSubscribers().forEach(PubSub.unsubscribe);
 /**
  * Determines if a doc matches a selector.
  * 
- * Arguments:
+ * @method matchesSelector
+ * @param message {Object} The message document to check if it matches with the selector.
+ * @param selector {Object} A Mongo Selector used to check the contents of the message to determine if the method is a match
  * 
- * message Object
- * The message document to check if it matches with the selector.
- * 
- * selector Mongo Selector, Object ID, or String
- * A query describing the message documents to find
- * 
+ * @return {Boolean} true if the message is a match to the selector; otherwise, false
  */
 PubSub.matchesSelector = function(message, selector){
     check(message,     Object);
@@ -178,6 +177,6 @@ PubSub.matchesSelector = function(message, selector){
     if( Match.test(selector, Object) )
         s.$and.push(selector);
 
-    return Match.test( Messages.findOne(s), Object );
+    return Match.test( Collections.Messages.findOne(s), Object );
 };
 

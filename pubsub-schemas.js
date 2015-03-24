@@ -1,12 +1,25 @@
-/**
-* Created with MakeItHappen.
-* User: lablancas
-* Date: 2015-03-22
-* Time: 07:23 PM
-* To change this template use Tools | Templates.
-*/
+/*
+ * Created with MakeItHappen.
+ * User: lablancas
+ * Date: 2015-03-22
+ * Time: 07:23 PM
+ * To change this template use Tools | Templates.
+ */
 
-createdAtAutoValue = function() {
+/**
+ * A static class for storing auto value functions which are used to build SimpleSchema Objects
+ * 
+ * @class AutoValues
+ * @static
+ */
+AutoValues = {};
+
+/**
+ * This method is used to automatically set a created at Date value in a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object
+ * 
+ * @method createdAtAutoValue
+ */
+AutoValues.createdAtAutoValue = function() {
     if (this.isInsert) {
         return new Date;
     } else if (this.isUpsert) {
@@ -16,7 +29,13 @@ createdAtAutoValue = function() {
     }
 };
 
-createdByAutoValue = function() {
+/**
+ * This method is used to automatically set a created by String value in a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object.
+ * Created By represents the currently logged in Meteor user or 'server'
+ * 
+ * @method createdByAutoValue
+ */
+AutoValues.createdByAutoValue = function() {
     if (this.isInsert) {
         return this.userId || 'server';
     } else if (this.isUpsert) {
@@ -26,7 +45,24 @@ createdByAutoValue = function() {
     }
 }
 
-MessageSchema = {
+
+/**
+ * A static class for storing objects used to build <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Objects
+ * 
+ * @class Schemas
+ * @static
+ */
+Schemas = {};
+
+
+/**
+ * This is the base Message Schema used to create a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object and validate the 
+ * structure of a Message before it is inserted into the Messages Collection
+ * 
+ * @property Message
+ * @type Object
+ */
+Schemas.Message = {
     
     //Auto-generated Mongo document _id is used as the message ID
     //_id:    { type: String }, 
@@ -39,12 +75,12 @@ MessageSchema = {
     // and prevent updates thereafter.
     'header.createdAt': {
         type: Date,
-        autoValue: createdAtAutoValue
+        autoValue: AutoValues.createdAtAutoValue
     },
 
     'header.createdBy': {
         type: String,
-        autoValue: createdByAutoValue
+        autoValue: AutoValues.createdByAutoValue
     },
     
     //These header fields are set by the message publisher/sender
@@ -73,15 +109,22 @@ MessageSchema = {
     
 };
 
-TopicSchema = new SimpleSchema({
+/**
+ * This is the Topic Schema used to validate the structure of a Topic before 
+ * it is inserted into the Topics Collection
+ * 
+ * @property Topic
+ * @type Object
+ */
+Schemas.Topic = new SimpleSchema({
     createdAt: {
         type: Date,
-        autoValue: createdAtAutoValue
+        autoValue: AutoValues.createdAtAutoValue
     },
     
     createdBy: {
         type: String,
-        autoValue: createdByAutoValue
+        autoValue: AutoValues.createdByAutoValue
     },
     
     name: {
@@ -91,18 +134,25 @@ TopicSchema = new SimpleSchema({
     }
 });
 
-TopicSubscriberSchema = new SimpleSchema({
+/**
+ * This is the Topic Subscriber Schema used to validate the structure of a 
+ * Topic Subscriber before it is inserted into the TopicSubscribers Collection
+ * 
+ * @property TopicSubscriber
+ * @type Object
+ */
+Schemas.TopicSubscriber = new SimpleSchema({
     
     // Force value to be current date (on server) upon insert
     // and prevent updates thereafter.
     startedAt: {
         type: Date,
-        autoValue: createdAtAutoValue
+        autoValue: AutoValues.createdAtAutoValue
     },
 
     startedBy: {
         type: String,
-        autoValue: createdByAutoValue
+        autoValue: AutoValues.createdByAutoValue
     },
     
     stoppedAt: { type: Date, optional: true },

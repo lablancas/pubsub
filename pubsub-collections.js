@@ -1,40 +1,74 @@
+/*
+ * Created with MakeItHappen.
+ * User: lablancas
+ * Date: 2015-03-22
+ * Time: 07:22 PM
+ * To change this template use Tools | Templates.
+ */
+
 /**
-* Created with MakeItHappen.
-* User: lablancas
-* Date: 2015-03-22
-* Time: 07:22 PM
-* To change this template use Tools | Templates.
-*/
+ * A static class for storing Mongo Collections
+ * 
+ * @class Collections
+ * @static
+ */
+Collections = {};
 
-Topics           = new Mongo.Collection("pubsub.topics");
-Topics.attachSchema(TopicSchema);
-delete Topics.attachSchema;
+/**
+ * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topics
+ * 
+ * @property Topics
+ * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
+ */
+Collections.Topics           = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.topics");
+Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
+delete Collections.Topics.attachSchema;
 
-TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
+/**
+ * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topics
+ * 
+ * @property TopicPublishers
+ * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
+ */
+Collections.TopicPublishers  = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.topic.publishers");
 
-TopicSubscribers = new Mongo.Collection("pubsub.topic.subscribers");
-TopicSubscribers.attachSchema(new SimpleSchema(TopicSubscriberSchema));
-delete TopicSubscribers.attachSchema;
+/**
+ * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topic Subscribers
+ * 
+ * @property TopicSubscribers
+ * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
+ */
+Collections.TopicSubscribers = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.topic.subscribers");
+Collections.TopicSubscribers.attachSchema(new SimpleSchema(Schemas.TopicSubscriber));
+delete Collections.TopicSubscribers.attachSchema;
 
-SubscriberFunctions = [];
+/**
+ * An Array for storing Functions belonging to a TopicSubscriber
+ * 
+ * @property SubscriberFunctions
+ * @type     Array
+ */
+Collections.SubscriberFunctions = [];
 
-Messages         = new Mongo.Collection("pubsub.messages");
-Messages.attachSchema(new SimpleSchema(MessageSchema));
-delete Messages.attachSchema;
+/**
+ * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Messages
+ * 
+ * @property Messages
+ * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
+ */
+Collections.Messages         = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.messages");
+Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
+delete Collections.Messages.attachSchema;
 
 /**
  * Publishes a message to all subscribers based on each subscribers selector and architecture.
  * 
- * Arguments:
- * 
- * userId String [Optional]
- * If message was published by a user, the userId; otherwise, undefined
- * 
- * message Object
- * The message document to publish to subscribers
+ * @method after.insert
+ * @param userId  {String} [Optional] If message was published by a user, the userId; otherwise, undefined
+ * @param message {Object} The message document to publish to subscribers
  * 
  */
-Messages.after.insert(function(userId, message){
+Collections.Messages.after.insert(function(userId, message){
     check(userId,  Match.Optional(String) );
     check(message, Object);
 
@@ -48,7 +82,7 @@ Messages.after.insert(function(userId, message){
         if( Match.test(subscriber.selector, String) ) 
             selector = JSON.parse(subscriber.selector);
         
-        var fn = SubscriberFunctions[subscriber._id];
+        var fn = Collections.SubscriberFunctions[subscriber._id];
         
         PubSub.debug && console.log("subscriber " + subscriber._id);
         PubSub.debug && console.log("    matches selector -> " + PubSub.matchesSelector(message, selector));

@@ -1,12 +1,22 @@
-/**
-* Created with MakeItHappen.
-* User: lablancas
-* Date: 2015-03-20
-* Time: 01:48 PM
-* To change this template use Tools | Templates.
-*/
+/*
+ * Created with MakeItHappen.
+ * User: lablancas
+ * Date: 2015-03-20
+ * Time: 01:48 PM
+ * To change this template use Tools | Templates.
+ */
 
+/**
+ * A Topic provides the needed information to determine how to publish a message, how to validate the
+ * structure of a message for this Topic, and a means to find messages for this Topic.
+ * 
+ * @class Topic
+ * @constructor
+ * @param name {String} the name to be assigned to this Topic
+ */
 Topic = function(name){
+    
+    check(name, String);
     
     var _self = this;
     
@@ -17,19 +27,23 @@ Topic = function(name){
      * 
      */
     
-    check(name, String);
-    
-    var _topic = Topics.findOne({name: name});
+    /**
+     * Contains the name and JSON stringified version of the message schema
+     * 
+     * @property _topic 
+     * @type Object
+     * @private
+     */
+    var _topic = Collections.Topics.findOne({name: name});
     
     if(Match.test(_topic, undefined)){
         _topic = {
             name: name,
-            schema: JSON.stringify(MessageSchema)
+            schema: JSON.stringify(Schemas.Message)
         };
         
-        _topic._id = Topics.insert(_topic);
+        _topic._id = Collections.Topics.insert(_topic);
     }
-    
     
     /*****************************************************************************************************
      * 
@@ -40,14 +54,21 @@ Topic = function(name){
     
     /**
      * Returns the name assigned to this topic. This was provided into the constructor method
+     * 
+     * @method getName
+     * @return {String} the name assigned to this Topic
      */
     _self.getName = function(){
         return _topic.name;  
     };
     
     /**
-     * See Mongo.Collection.find
-     * http://docs.meteor.com/#/full/find
+     * See <a href="http://docs.meteor.com/#/full/find">Mongo.Collection.find</a>
+     * 
+     * @method find
+     * @param selector {Object} [Optional] See MongoDB Selector
+     * @param options  {Object} [Optional] See MongoDB Selector Options
+     * @return <a href="http://docs.meteor.com/#/full/mongo_cursor">Mongo.Cursor</a> A cursor object containing the Topic messages matching your request
      */
     _self.find = function(selector, options){
         check(selector, Match.OneOf(Object, String, undefined));
@@ -61,12 +82,16 @@ Topic = function(name){
         else if ( Match.test(selector, String) )
             s.$and.push({_id: selector});
         
-        return Messages.find(s, options);
+        return Collections.Messages.find(s, options);
     };
     
     /**
-     * See Mongo.Collection.findOne
-     * http://docs.meteor.com/#/full/findone
+     * See <a href="http://docs.meteor.com/#/full/findone">Mongo.Collection.findOne</a>
+     * 
+     * @method findOne
+     * @param selector {Object} [Optional] See MongoDB Selector
+     * @param options  {Object} [Optional] See MongoDB Selector Options
+     * @return <a href="http://docs.meteor.com/#/full/mongo_cursor">Mongo.Cursor</a> The first object containing the Topic message matching your request
      */
     _self.findOne = function(selector, options){
         check(selector, Match.OneOf(Object, String, undefined));
@@ -80,27 +105,23 @@ Topic = function(name){
         else if ( Match.test(selector, String) )
             s.$and.push({_id: selector});
         
-        return Messages.findOne(s, options);
+        return Collections.Messages.findOne(s, options);
     };
     
     /**
      * Sets the Message Body schema for this Topic. Returns void.
      * 
-     * schema Object
-     * The schema you want to use for the body of a message document. 
+     * @method setSchema
+     * @param schema {Object}
+     * [Optional] The schema you want to use for the body of a message document. 
      * This object will be assigned as the type value of the message 
-     * body so you can use a Javascript Object including a SimpleSchema 
+     * body so you can use a Javascript Object including a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> 
      * Object (see https://github.com/aldeed/meteor-simple-schema#schema-rules).
-     * 
-     * See Collection2 and SimpleSchema
-     * 
-     * https://atmospherejs.com/aldeed/collection2
-     * https://atmospherejs.com/aldeed/simple-schema
      * 
      */
     _self.setSchema = function(schema){
         check(schema, Match.Optional(SimpleSchema));
-        var messageSchema = _.clone(MessageSchema);
+        var messageSchema = _.clone(Schemas.Message);
 
         if( Match.test(schema, SimpleSchema) )
             messageSchema.body = {type: schema};
@@ -113,10 +134,8 @@ Topic = function(name){
     /**
      * Returns the SimpleSchema Object attached to this Topic.
      * 
-     * See Collection2 and SimpleSchema
-     * 
-     * https://atmospherejs.com/aldeed/collection2
-     * https://atmospherejs.com/aldeed/simple-schema
+     * @method getSchema
+     * @return <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> The <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object used to validate messages for this Topic
      * 
      */
     _self.getSchema = function(){
@@ -128,10 +147,8 @@ Topic = function(name){
     /**
      * Creates a message object for you to publish and/or validate.
      * 
-     * Arguments:
-     * 
-     * messageBody Object
-     * The body of the message you would like to publish.
+     * @method createMessage
+     * @param messageBody {Object} [Optional] The body of the message you would like to publish.
      * 
      */
     _self.createMessage = function(messageBody){
@@ -150,12 +167,10 @@ Topic = function(name){
     }
     
     /**
-     * Checks if your message is valid and returns a Simple Schema Validation Context after the message has been validated
+     * Checks if your message is valid and returns a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Validation Context after the message has been validated
      * 
-     * Arguments:
-     * 
-     * message Object
-     * The message you would like to publish. See Topic.createMessage
+     * @method validate
+     * @param message {Object} The message you would like to publish. See {{#crossLink "Topic/createMessage:method"}}{{/crossLink}}
      * 
      */
     _self.validate = function(message){
@@ -167,10 +182,7 @@ Topic = function(name){
         return validator;
     };
     
-    
-    /**
-     * Constructor
-     */
+    // INITIALIZE Topic Schema
     _self.setSchema();
 };
 

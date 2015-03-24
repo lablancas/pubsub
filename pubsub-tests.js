@@ -1,10 +1,10 @@
-/**
-* Created with MakeItHappen.
-* User: lablancas
-* Date: 2015-03-20
-* Time: 02:19 PM
-* To change this template use Tools | Templates.
-*/
+/*
+ * Created with MakeItHappen.
+ * User: lablancas
+ * Date: 2015-03-20
+ * Time: 02:19 PM
+ * To change this template use Tools | Templates.
+ */
 
 TEST_CASES = [
     {name: 'NO   message schema & NO   message body = SUCCESS', 
@@ -47,9 +47,9 @@ TEST_CASES = [
 ];
 
 cleanup = function(){
-    Messages.find().forEach(function(msg){ Messages.remove(msg._id); });
-    TopicSubscribers.find().forEach(PubSub.unsubscribe);
-    Topics.find().forEach(function(doc){ Topics.remove(doc._id); });
+    Collections.Messages.find().forEach(function(msg){ Collections.Messages.remove(msg._id); });
+    Collections.TopicSubscribers.find().forEach(PubSub.unsubscribe);
+    Collections.Topics.find().forEach(function(doc){ Collections.Topics.remove(doc._id); });
 };
 
 Tinytest.add('PubSub - Validate Exported Objects', function(test){

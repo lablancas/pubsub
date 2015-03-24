@@ -27,9 +27,7 @@ Package.onUse(function(api) {
     api.addFiles('pubsub.js');
     
     api.export('PubSub');
-    api.export('Messages');
-    api.export('Topics');
-    api.export('TopicSubscribers');
+    api.export('Collections');
 });
 
 Package.onTest(function(api) {
