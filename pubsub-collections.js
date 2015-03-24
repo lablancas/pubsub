@@ -7,7 +7,7 @@
  */
 
 /**
- * A static class for storing Mongo PubSub.Collections
+ * A static class for storing Mongo.Collection Objects
  * 
  * @class PubSub.Collections
  * @static
@@ -15,8 +15,9 @@
 PubSub.Collections = {};
 
 /**
- * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topics
+ * A Mongo.Collection object for storing Topics
  * 
+ * @for PubSub.Collections
  * @property Topics
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
@@ -25,16 +26,18 @@ PubSub.Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
 delete PubSub.Collections.Topics.attachSchema;
 
 /**
- * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topics
+ * A Mongo.Collection object for storing Topics
  * 
+ * @for PubSub.Collections
  * @property TopicPublishers
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
 PubSub.Collections.TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
 
 /**
- * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topic Subscribers
+ * A Mongo.Collection object for storing Topic Subscribers
  * 
+ * @for PubSub.Collections
  * @property TopicSubscribers
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
@@ -45,14 +48,16 @@ delete PubSub.Collections.TopicSubscribers.attachSchema;
 /**
  * An Array for storing Functions belonging to a TopicSubscriber
  * 
+ * @for PubSub.Collections
  * @property SubscriberFunctions
  * @type     Array
  */
 PubSub.Collections.SubscriberFunctions = [];
 
 /**
- * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Messages
+ * A Mongo.Collection object for storing Messages
  * 
+ * @for PubSub.Collections
  * @property Messages
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
@@ -60,12 +65,8 @@ PubSub.Collections.Messages         = new Mongo.Collection("pubsub.messages");
 PubSub.Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
 delete PubSub.Collections.Messages.attachSchema;
 
-/**
+/*
  * Publishes a message to all subscribers based on each subscribers selector and architecture.
- * 
- * @method after.insert
- * @param userId  {String} [Optional] If message was published by a user, the userId; otherwise, undefined
- * @param message {Object} The message document to publish to subscribers
  * 
  */
 PubSub.Collections.Messages.after.insert(function(userId, message){

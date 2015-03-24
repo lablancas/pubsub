@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Collections</title>
+    <title>PubSub.Collections</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -39,8 +39,8 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/AutoValues.html">AutoValues</a></li>
-                                <li><a href="../classes/Collections.html">Collections</a></li>
                                 <li><a href="../classes/PubSub.html">PubSub</a></li>
+                                <li><a href="../classes/PubSub.Collections.html">PubSub.Collections</a></li>
                                 <li><a href="../classes/Schemas.html">Schemas</a></li>
                                 <li><a href="../classes/Topic.html">Topic</a></li>
                             </ul>
@@ -79,7 +79,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>Collections Class</h1>
+<h1>PubSub.Collections Class</h1>
 <div class="box meta">
 
 
@@ -92,7 +92,7 @@
 
 
 <div class="box intro">
-    <p>A static class for storing Mongo Collections</p>
+    <p>A static class for storing Mongo.Collection Objects</p>
 
 </div>
 
@@ -101,7 +101,6 @@
     <ul class="api-class-tabs">
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
             <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
     </ul>
 
@@ -109,16 +108,6 @@
         <div id="index" class="api-class-tabpanel index">
             <h2 class="off-left">Item Index</h2>
 
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                            <li class="index-item method">
-                                <a href="#method_after.insert">after.insert</a>
-
-                            </li>
-                    </ul>
-                </div>
 
                 <div class="index-section properties">
                     <h3>Properties</h3>
@@ -150,78 +139,6 @@
 
         </div>
 
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-<div id="method_after.insert" class="method item">
-    <h3 class="name"><code>after.insert</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>userId</code>
-                </li>
-                <li class="arg">
-                        <code>message</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/pubsub-collections.js.html#l63"><code>pubsub-collections.js:63</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Publishes a message to all subscribers based on each subscribers selector and architecture.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">userId</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>[Optional] If message was published by a user, the userId; otherwise, undefined</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">message</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The message document to publish to subscribers</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-            </div>
 
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
@@ -237,14 +154,14 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/pubsub-collections.js.html#l53"><code>pubsub-collections.js:53</code></a>
+                            <a href="../files/pubsub-collections.js.html#l57"><code>pubsub-collections.js:57</code></a>
                             </p>
                     
                     
                         </div>
                     
                         <div class="description">
-                            <p>A &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt; object for storing Messages</p>
+                            <p>A Mongo.Collection object for storing Messages</p>
                     
                         </div>
                     
@@ -262,7 +179,7 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/pubsub-collections.js.html#l45"><code>pubsub-collections.js:45</code></a>
+                            <a href="../files/pubsub-collections.js.html#l48"><code>pubsub-collections.js:48</code></a>
                             </p>
                     
                     
@@ -287,14 +204,14 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/pubsub-collections.js.html#l27"><code>pubsub-collections.js:27</code></a>
+                            <a href="../files/pubsub-collections.js.html#l28"><code>pubsub-collections.js:28</code></a>
                             </p>
                     
                     
                         </div>
                     
                         <div class="description">
-                            <p>A &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt; object for storing Topics</p>
+                            <p>A Mongo.Collection object for storing Topics</p>
                     
                         </div>
                     
@@ -319,7 +236,7 @@
                         </div>
                     
                         <div class="description">
-                            <p>A &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt; object for storing Topics</p>
+                            <p>A Mongo.Collection object for storing Topics</p>
                     
                         </div>
                     
@@ -337,14 +254,14 @@
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/pubsub-collections.js.html#l35"><code>pubsub-collections.js:35</code></a>
+                            <a href="../files/pubsub-collections.js.html#l37"><code>pubsub-collections.js:37</code></a>
                             </p>
                     
                     
                         </div>
                     
                         <div class="description">
-                            <p>A &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt; object for storing Topic Subscribers</p>
+                            <p>A Mongo.Collection object for storing Topic Subscribers</p>
                     
                         </div>
                     

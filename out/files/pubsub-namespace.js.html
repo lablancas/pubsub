@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>pubsub-collections.js</title>
+    <title>pubsub-namespace.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -79,110 +79,33 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: pubsub-collections.js</h1>
+<h1 class="file-heading">File: pubsub-namespace.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /*
- * Created with MakeItHappen.
+ * Created with MakeItHap* Created with MakeItHappen.
  * User: lablancas
- * Date: 2015-03-22
- * Time: 07:22 PM
+ * Date: 2015-03-24
+ * Time: 07:59 PM
  * To change this template use Tools | Templates.
  */
 
-/**
- * A static class for storing Mongo.Collection Objects
- * 
- * @class PubSub.Collections
- * @static
- */
-PubSub.Collections = {};
-
-/**
- * A Mongo.Collection object for storing Topics
- * 
- * @for PubSub.Collections
- * @property Topics
- * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
- */
-PubSub.Collections.Topics           = new Mongo.Collection(&quot;pubsub.topics&quot;);
-PubSub.Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
-delete PubSub.Collections.Topics.attachSchema;
-
-/**
- * A Mongo.Collection object for storing Topics
- * 
- * @for PubSub.Collections
- * @property TopicPublishers
- * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
- */
-PubSub.Collections.TopicPublishers  = new Mongo.Collection(&quot;pubsub.topic.publishers&quot;);
-
-/**
- * A Mongo.Collection object for storing Topic Subscribers
- * 
- * @for PubSub.Collections
- * @property TopicSubscribers
- * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
- */
-PubSub.Collections.TopicSubscribers = new Mongo.Collection(&quot;pubsub.topic.subscribers&quot;);
-PubSub.Collections.TopicSubscribers.attachSchema(new SimpleSchema(Schemas.TopicSubscriber));
-delete PubSub.Collections.TopicSubscribers.attachSchema;
-
-/**
- * An Array for storing Functions belonging to a TopicSubscriber
- * 
- * @for PubSub.Collections
- * @property SubscriberFunctions
- * @type     Array
- */
-PubSub.Collections.SubscriberFunctions = [];
-
-/**
- * A Mongo.Collection object for storing Messages
- * 
- * @for PubSub.Collections
- * @property Messages
- * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
- */
-PubSub.Collections.Messages         = new Mongo.Collection(&quot;pubsub.messages&quot;);
-PubSub.Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
-delete PubSub.Collections.Messages.attachSchema;
-
-/*
- * Publishes a message to all subscribers based on each subscribers selector and architecture.
- * 
- */
-PubSub.Collections.Messages.after.insert(function(userId, message){
-    check(userId,  Match.Optional(String) );
-    check(message, Object);
-
+ /** 
+  * The Static Class containing the primary Publish/Subscribe functions and properties
+  * 
+  * @class PubSub
+  * @static
+  */ 
+PubSub = {
     
-    PubSub.debug &amp;&amp; console.log(&quot;Message Published&quot;);
-    PubSub.debug &amp;&amp; console.log(PubSub.getActiveSubscribers().count() + &quot; Active Subscriber(s)&quot;);
-    
-    PubSub.getActiveSubscribers().forEach(function(subscriber){
-        var selector;
-        
-        if( Match.test(subscriber.selector, String) ) 
-            selector = JSON.parse(subscriber.selector);
-        
-        var fn = PubSub.Collections.SubscriberFunctions[subscriber._id];
-        
-        PubSub.debug &amp;&amp; console.log(&quot;subscriber &quot; + subscriber._id);
-        PubSub.debug &amp;&amp; console.log(&quot;    matches selector -&gt; &quot; + PubSub.matchesSelector(message, selector));
-        PubSub.debug &amp;&amp; console.log(&quot;    check architecture -&gt; &quot; + PubSub.checkArchitecture(subscriber.architecture));
-        
-        
-        if( !Match.test(fn, Function) )
-            console.log(&quot;ERROR: Could not find a valid function for subscriber &quot; + subscriber._id);
-        
-        else if(PubSub.matchesSelector(message, selector))
-            fn(userId, message);
-
-    });
-});
+    /**
+     * Used to disable/enable debug logging output
+     * 
+     * @property debug {Boolean}
+     */
+    debug: false
+};
     </pre>
 </div>
                     </div>

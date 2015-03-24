@@ -39,8 +39,8 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/AutoValues.html">AutoValues</a></li>
-                                <li><a href="../classes/Collections.html">Collections</a></li>
                                 <li><a href="../classes/PubSub.html">PubSub</a></li>
+                                <li><a href="../classes/PubSub.Collections.html">PubSub.Collections</a></li>
                                 <li><a href="../classes/Schemas.html">Schemas</a></li>
                                 <li><a href="../classes/Topic.html">Topic</a></li>
                             </ul>
@@ -105,8 +105,8 @@ Topic = function(name){
     
     var _self = this;
     
-    /*****************************************************************************************************
-     * 
+    /*
+     ***************************************************************************************************** 
      * PRIVATE VARIABLES &amp; METHODS
      * 
      * 
@@ -119,7 +119,7 @@ Topic = function(name){
      * @type Object
      * @private
      */
-    var _topic = Collections.Topics.findOne({name: name});
+    var _topic = PubSub.Collections.Topics.findOne({name: name});
     
     if(Match.test(_topic, undefined)){
         _topic = {
@@ -127,11 +127,11 @@ Topic = function(name){
             schema: JSON.stringify(Schemas.Message)
         };
         
-        _topic._id = Collections.Topics.insert(_topic);
+        _topic._id = PubSub.Collections.Topics.insert(_topic);
     }
     
-    /*****************************************************************************************************
-     * 
+    /*
+     ***************************************************************************************************** 
      * PUBLIC METHODS
      * 
      * 
@@ -148,12 +148,12 @@ Topic = function(name){
     };
     
     /**
-     * See &lt;a href=&quot;http://docs.meteor.com/#/full/find&quot;&gt;Mongo.Collection.find&lt;/a&gt;
+     * See Mongo.Collection.find http://docs.meteor.com/#/full/find
      * 
      * @method find
      * @param selector {Object} [Optional] See MongoDB Selector
      * @param options  {Object} [Optional] See MongoDB Selector Options
-     * @return &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_cursor&quot;&gt;Mongo.Cursor&lt;/a&gt; A cursor object containing the Topic messages matching your request
+     * @return {Mongo.Cursor} A cursor object containing the Topic messages matching your request
      */
     _self.find = function(selector, options){
         check(selector, Match.OneOf(Object, String, undefined));
@@ -167,16 +167,16 @@ Topic = function(name){
         else if ( Match.test(selector, String) )
             s.$and.push({_id: selector});
         
-        return Collections.Messages.find(s, options);
+        return PubSub.Collections.Messages.find(s, options);
     };
     
     /**
-     * See &lt;a href=&quot;http://docs.meteor.com/#/full/findone&quot;&gt;Mongo.Collection.findOne&lt;/a&gt;
+     * See Mongo.Collection.findOne http://docs.meteor.com/#/full/findone
      * 
      * @method findOne
      * @param selector {Object} [Optional] See MongoDB Selector
      * @param options  {Object} [Optional] See MongoDB Selector Options
-     * @return &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_cursor&quot;&gt;Mongo.Cursor&lt;/a&gt; The first object containing the Topic message matching your request
+     * @return {Object} The first object containing the Topic message matching your request
      */
     _self.findOne = function(selector, options){
         check(selector, Match.OneOf(Object, String, undefined));
@@ -190,18 +190,15 @@ Topic = function(name){
         else if ( Match.test(selector, String) )
             s.$and.push({_id: selector});
         
-        return Collections.Messages.findOne(s, options);
+        return PubSub.Collections.Messages.findOne(s, options);
     };
     
     /**
      * Sets the Message Body schema for this Topic. Returns void.
      * 
      * @method setSchema
-     * @param schema {Object}
-     * [Optional] The schema you want to use for the body of a message document. 
-     * This object will be assigned as the type value of the message 
-     * body so you can use a Javascript Object including a &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; 
-     * Object (see https://github.com/aldeed/meteor-simple-schema#schema-rules).
+     * @param schema {SimpleSchema}
+     * [Optional] The schema you want to use for the body of a message document.
      * 
      */
     _self.setSchema = function(schema){
@@ -220,7 +217,7 @@ Topic = function(name){
      * Returns the SimpleSchema Object attached to this Topic.
      * 
      * @method getSchema
-     * @return &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; The &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; Object used to validate messages for this Topic
+     * @return {SimpleSchema} The SimpleSchema Object used to validate messages for this Topic
      * 
      */
     _self.getSchema = function(){
@@ -252,11 +249,12 @@ Topic = function(name){
     }
     
     /**
-     * Checks if your message is valid and returns a &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; Validation Context after the message has been validated
+     * Checks if your message is valid and returns a SimpleSchemaValidationContext after the message has been validated
      * 
      * @method validate
      * @param message {Object} The message you would like to publish. See {{#crossLink &quot;Topic/createMessage:method&quot;}}{{/crossLink}}
      * 
+     * @return {SimpleSchemaValidationContext}
      */
     _self.validate = function(message){
         check(message, Object);

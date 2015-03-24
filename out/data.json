@@ -5,7 +5,18 @@
             "name": "pubsub-collections.js",
             "modules": {},
             "classes": {
-                "Collections": 1
+                "PubSub.Collections": 1
+            },
+            "fors": {
+                "PubSub.Collections": 1
+            },
+            "namespaces": {}
+        },
+        "pubsub-namespace.js": {
+            "name": "pubsub-namespace.js",
+            "modules": {},
+            "classes": {
+                "PubSub": 1
             },
             "fors": {},
             "namespaces": {}
@@ -32,18 +43,18 @@
         "pubsub.js": {
             "name": "pubsub.js",
             "modules": {},
-            "classes": {
+            "classes": {},
+            "fors": {
                 "PubSub": 1
             },
-            "fors": {},
             "namespaces": {}
         }
     },
     "modules": {},
     "classes": {
-        "Collections": {
-            "name": "Collections",
-            "shortname": "Collections",
+        "PubSub.Collections": {
+            "name": "PubSub.Collections",
+            "shortname": "PubSub.Collections",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -51,7 +62,20 @@
             "extension_for": [],
             "file": "pubsub-collections.js",
             "line": 9,
-            "description": "A static class for storing Mongo Collections",
+            "description": "A static class for storing Mongo.Collection Objects",
+            "static": 1
+        },
+        "PubSub": {
+            "name": "PubSub",
+            "shortname": "PubSub",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "pubsub-namespace.js",
+            "line": 9,
+            "description": "The Static Class containing the primary Publish/Subscribe functions and properties",
             "static": 1
         },
         "AutoValues": {
@@ -65,7 +89,9 @@
             "file": "pubsub-schemas.js",
             "line": 9,
             "description": "A static class for storing auto value functions which are used to build SimpleSchema Objects",
-            "static": 1
+            "static": 1,
+            "access": "private",
+            "tagname": ""
         },
         "Schemas": {
             "name": "Schemas",
@@ -76,9 +102,11 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "pubsub-schemas.js",
-            "line": 49,
-            "description": "A static class for storing objects used to build <a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> Objects",
-            "static": 1
+            "line": 50,
+            "description": "A static class for storing objects used to build SimpleSchema Objects",
+            "static": 1,
+            "access": "private",
+            "tagname": ""
         },
         "Topic": {
             "name": "Topic",
@@ -99,107 +127,83 @@
                     "type": "String"
                 }
             ]
-        },
-        "PubSub": {
-            "name": "PubSub",
-            "shortname": "PubSub",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "file": "pubsub.js",
-            "line": 9,
-            "description": "The Static Class containing the primary Publish/Subscribe functions and properties",
-            "static": 1
         }
     },
     "classitems": [
         {
             "file": "pubsub-collections.js",
             "line": 17,
-            "description": "A <a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a> object for storing Topics",
+            "description": "A Mongo.Collection object for storing Topics",
             "itemtype": "property",
             "name": "Topics",
             "type": "<a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a>",
-            "class": "Collections"
+            "class": "PubSub.Collections"
         },
         {
             "file": "pubsub-collections.js",
-            "line": 27,
-            "description": "A <a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a> object for storing Topics",
+            "line": 28,
+            "description": "A Mongo.Collection object for storing Topics",
             "itemtype": "property",
             "name": "TopicPublishers",
             "type": "<a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a>",
-            "class": "Collections"
+            "class": "PubSub.Collections"
         },
         {
             "file": "pubsub-collections.js",
-            "line": 35,
-            "description": "A <a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a> object for storing Topic Subscribers",
+            "line": 37,
+            "description": "A Mongo.Collection object for storing Topic Subscribers",
             "itemtype": "property",
             "name": "TopicSubscribers",
             "type": "<a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a>",
-            "class": "Collections"
+            "class": "PubSub.Collections"
         },
         {
             "file": "pubsub-collections.js",
-            "line": 45,
+            "line": 48,
             "description": "An Array for storing Functions belonging to a TopicSubscriber",
             "itemtype": "property",
             "name": "SubscriberFunctions",
             "type": "Array",
-            "class": "Collections"
+            "class": "PubSub.Collections"
         },
         {
             "file": "pubsub-collections.js",
-            "line": 53,
-            "description": "A <a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a> object for storing Messages",
+            "line": 57,
+            "description": "A Mongo.Collection object for storing Messages",
             "itemtype": "property",
             "name": "Messages",
             "type": "<a href=\"http://docs.meteor.com/#/full/mongo_collection\">Mongo.Collection</a>",
-            "class": "Collections"
+            "class": "PubSub.Collections"
         },
         {
-            "file": "pubsub-collections.js",
-            "line": 63,
-            "description": "Publishes a message to all subscribers based on each subscribers selector and architecture.",
-            "itemtype": "method",
-            "name": "after.insert",
-            "params": [
-                {
-                    "name": "userId",
-                    "description": "[Optional] If message was published by a user, the userId; otherwise, undefined",
-                    "type": "String"
-                },
-                {
-                    "name": "message",
-                    "description": "The message document to publish to subscribers",
-                    "type": "Object"
-                }
-            ],
-            "class": "Collections"
+            "file": "pubsub-namespace.js",
+            "line": 17,
+            "description": "Used to disable/enable debug logging output",
+            "itemtype": "property",
+            "name": "debug",
+            "type": "Boolean",
+            "class": "PubSub"
         },
         {
             "file": "pubsub-schemas.js",
-            "line": 17,
-            "description": "This method is used to automatically set a created at Date value in a <a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> Object",
+            "line": 18,
+            "description": "This method is used to automatically set a created at Date value in a SimpleSchema Object",
             "itemtype": "method",
             "name": "createdAtAutoValue",
             "class": "AutoValues"
         },
         {
             "file": "pubsub-schemas.js",
-            "line": 32,
-            "description": "This method is used to automatically set a created by String value in a <a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> Object.\nCreated By represents the currently logged in Meteor user or 'server'",
+            "line": 33,
+            "description": "This method is used to automatically set a created by String value in a SimpleSchema Object.\nCreated By represents the currently logged in Meteor user or 'server'",
             "itemtype": "method",
             "name": "createdByAutoValue",
             "class": "AutoValues"
         },
         {
             "file": "pubsub-schemas.js",
-            "line": 58,
-            "description": "This is the base Message Schema used to create a <a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> Object and validate the \nstructure of a Message before it is inserted into the Messages Collection",
+            "line": 60,
+            "description": "This is the base Message Schema used to create a SimpleSchema Object and validate the \nstructure of a Message before it is inserted into the Messages Collection",
             "itemtype": "property",
             "name": "Message",
             "type": "Object",
@@ -207,7 +211,7 @@
         },
         {
             "file": "pubsub-schemas.js",
-            "line": 112,
+            "line": 114,
             "description": "This is the Topic Schema used to validate the structure of a Topic before \nit is inserted into the Topics Collection",
             "itemtype": "property",
             "name": "Topic",
@@ -216,18 +220,12 @@
         },
         {
             "file": "pubsub-schemas.js",
-            "line": 137,
+            "line": 139,
             "description": "This is the Topic Subscriber Schema used to validate the structure of a \nTopic Subscriber before it is inserted into the TopicSubscribers Collection",
             "itemtype": "property",
             "name": "TopicSubscriber",
             "type": "Object",
             "class": "Schemas"
-        },
-        {
-            "file": "pubsub-topics.js",
-            "line": 23,
-            "description": "PRIVATE VARIABLES & METHODS",
-            "class": "Topic"
         },
         {
             "file": "pubsub-topics.js",
@@ -238,12 +236,6 @@
             "type": "Object",
             "access": "private",
             "tagname": "",
-            "class": "Topic"
-        },
-        {
-            "file": "pubsub-topics.js",
-            "line": 48,
-            "description": "PUBLIC METHODS",
             "class": "Topic"
         },
         {
@@ -261,7 +253,7 @@
         {
             "file": "pubsub-topics.js",
             "line": 65,
-            "description": "See <a href=\"http://docs.meteor.com/#/full/find\">Mongo.Collection.find</a>",
+            "description": "See Mongo.Collection.find http://docs.meteor.com/#/full/find",
             "itemtype": "method",
             "name": "find",
             "params": [
@@ -277,14 +269,15 @@
                 }
             ],
             "return": {
-                "description": "<a href=\"http://docs.meteor.com/#/full/mongo_cursor\">Mongo.Cursor</a> A cursor object containing the Topic messages matching your request"
+                "description": "A cursor object containing the Topic messages matching your request",
+                "type": "Mongo.Cursor"
             },
             "class": "Topic"
         },
         {
             "file": "pubsub-topics.js",
             "line": 88,
-            "description": "See <a href=\"http://docs.meteor.com/#/full/findone\">Mongo.Collection.findOne</a>",
+            "description": "See Mongo.Collection.findOne http://docs.meteor.com/#/full/findone",
             "itemtype": "method",
             "name": "findOne",
             "params": [
@@ -300,7 +293,8 @@
                 }
             ],
             "return": {
-                "description": "<a href=\"http://docs.meteor.com/#/full/mongo_cursor\">Mongo.Cursor</a> The first object containing the Topic message matching your request"
+                "description": "The first object containing the Topic message matching your request",
+                "type": "Object"
             },
             "class": "Topic"
         },
@@ -313,26 +307,27 @@
             "params": [
                 {
                     "name": "schema",
-                    "description": "\n[Optional] The schema you want to use for the body of a message document. \nThis object will be assigned as the type value of the message \nbody so you can use a Javascript Object including a <a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> \nObject (see https://github.com/aldeed/meteor-simple-schema#schema-rules).",
-                    "type": "Object"
+                    "description": "\n[Optional] The schema you want to use for the body of a message document.",
+                    "type": "SimpleSchema"
                 }
             ],
             "class": "Topic"
         },
         {
             "file": "pubsub-topics.js",
-            "line": 134,
+            "line": 131,
             "description": "Returns the SimpleSchema Object attached to this Topic.",
             "itemtype": "method",
             "name": "getSchema",
             "return": {
-                "description": "<a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> The <a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> Object used to validate messages for this Topic"
+                "description": "The SimpleSchema Object used to validate messages for this Topic",
+                "type": "SimpleSchema"
             },
             "class": "Topic"
         },
         {
             "file": "pubsub-topics.js",
-            "line": 147,
+            "line": 144,
             "description": "Creates a message object for you to publish and/or validate.",
             "itemtype": "method",
             "name": "createMessage",
@@ -347,8 +342,8 @@
         },
         {
             "file": "pubsub-topics.js",
-            "line": 169,
-            "description": "Checks if your message is valid and returns a <a href=\"https://atmospherejs.com/aldeed/simple-schema\">SimpleSchema</a> Validation Context after the message has been validated",
+            "line": 166,
+            "description": "Checks if your message is valid and returns a SimpleSchemaValidationContext after the message has been validated",
             "itemtype": "method",
             "name": "validate",
             "params": [
@@ -358,20 +353,15 @@
                     "type": "Object"
                 }
             ],
+            "return": {
+                "description": "",
+                "type": "SimpleSchemaValidationContext"
+            },
             "class": "Topic"
         },
         {
             "file": "pubsub.js",
-            "line": 17,
-            "description": "Used to disable/enable debug logging output",
-            "itemtype": "property",
-            "name": "debug",
-            "type": "Boolean",
-            "class": "PubSub"
-        },
-        {
-            "file": "pubsub.js",
-            "line": 26,
+            "line": 9,
             "description": "Creates a {{#crossLink \"Topic\"}}{{/crossLink}} Object",
             "itemtype": "method",
             "name": "createTopic",
@@ -390,7 +380,7 @@
         },
         {
             "file": "pubsub.js",
-            "line": 38,
+            "line": 22,
             "description": "Returns the current, active subscribers",
             "itemtype": "method",
             "name": "getActiveSubscribers",
@@ -402,14 +392,13 @@
                 }
             ],
             "return": {
-                "description": "<a href=\"http://docs.meteor.com/#/full/mongo_cursor\">Mongo.Cursor</a> A cursor object containing the Topic Subscribers of a }{{/crossLink}} or all Topics",
-                "type": "#crossLink \"Topic\""
+                "description": "Mongo.Cursor A cursor object containing the Topic Subscribers of a Topic or all Topics"
             },
             "class": "PubSub"
         },
         {
             "file": "pubsub.js",
-            "line": 59,
+            "line": 44,
             "description": "Publish a message on a {{#crossLink \"Topic\"}}{{/crossLink}}",
             "itemtype": "method",
             "name": "publish",
@@ -442,7 +431,7 @@
         },
         {
             "file": "pubsub.js",
-            "line": 90,
+            "line": 76,
             "description": "Creates a topic subscriber which calls the function defined by the caller. Returns a Subscriber Object.",
             "itemtype": "method",
             "name": "subscribe",
@@ -471,7 +460,7 @@
         },
         {
             "file": "pubsub.js",
-            "line": 138,
+            "line": 125,
             "description": "Removes a topic subscriber",
             "itemtype": "method",
             "name": "unsubscribe",
@@ -486,7 +475,7 @@
         },
         {
             "file": "pubsub.js",
-            "line": 161,
+            "line": 149,
             "description": "Determines if a doc matches a selector.",
             "itemtype": "method",
             "name": "matchesSelector",
@@ -509,14 +498,5 @@
             "class": "PubSub"
         }
     ],
-    "warnings": [
-        {
-            "message": "Missing item type\nPRIVATE VARIABLES & METHODS",
-            "line": " pubsub-topics.js:23"
-        },
-        {
-            "message": "Missing item type\nPUBLIC METHODS",
-            "line": " pubsub-topics.js:48"
-        }
-    ]
+    "warnings": []
 }

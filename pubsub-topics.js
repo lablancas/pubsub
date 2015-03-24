@@ -20,8 +20,8 @@ Topic = function(name){
     
     var _self = this;
     
-    /*****************************************************************************************************
-     * 
+    /*
+     ***************************************************************************************************** 
      * PRIVATE VARIABLES & METHODS
      * 
      * 
@@ -45,8 +45,8 @@ Topic = function(name){
         _topic._id = PubSub.Collections.Topics.insert(_topic);
     }
     
-    /*****************************************************************************************************
-     * 
+    /*
+     ***************************************************************************************************** 
      * PUBLIC METHODS
      * 
      * 
@@ -63,12 +63,12 @@ Topic = function(name){
     };
     
     /**
-     * See <a href="http://docs.meteor.com/#/full/find">Mongo.Collection.find</a>
+     * See Mongo.Collection.find http://docs.meteor.com/#/full/find
      * 
      * @method find
      * @param selector {Object} [Optional] See MongoDB Selector
      * @param options  {Object} [Optional] See MongoDB Selector Options
-     * @return <a href="http://docs.meteor.com/#/full/mongo_cursor">Mongo.Cursor</a> A cursor object containing the Topic messages matching your request
+     * @return {Mongo.Cursor} A cursor object containing the Topic messages matching your request
      */
     _self.find = function(selector, options){
         check(selector, Match.OneOf(Object, String, undefined));
@@ -86,12 +86,12 @@ Topic = function(name){
     };
     
     /**
-     * See <a href="http://docs.meteor.com/#/full/findone">Mongo.Collection.findOne</a>
+     * See Mongo.Collection.findOne http://docs.meteor.com/#/full/findone
      * 
      * @method findOne
      * @param selector {Object} [Optional] See MongoDB Selector
      * @param options  {Object} [Optional] See MongoDB Selector Options
-     * @return <a href="http://docs.meteor.com/#/full/mongo_cursor">Mongo.Cursor</a> The first object containing the Topic message matching your request
+     * @return {Object} The first object containing the Topic message matching your request
      */
     _self.findOne = function(selector, options){
         check(selector, Match.OneOf(Object, String, undefined));
@@ -112,11 +112,8 @@ Topic = function(name){
      * Sets the Message Body schema for this Topic. Returns void.
      * 
      * @method setSchema
-     * @param schema {Object}
-     * [Optional] The schema you want to use for the body of a message document. 
-     * This object will be assigned as the type value of the message 
-     * body so you can use a Javascript Object including a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> 
-     * Object (see https://github.com/aldeed/meteor-simple-schema#schema-rules).
+     * @param schema {SimpleSchema}
+     * [Optional] The schema you want to use for the body of a message document.
      * 
      */
     _self.setSchema = function(schema){
@@ -135,7 +132,7 @@ Topic = function(name){
      * Returns the SimpleSchema Object attached to this Topic.
      * 
      * @method getSchema
-     * @return <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> The <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object used to validate messages for this Topic
+     * @return {SimpleSchema} The SimpleSchema Object used to validate messages for this Topic
      * 
      */
     _self.getSchema = function(){
@@ -167,11 +164,12 @@ Topic = function(name){
     }
     
     /**
-     * Checks if your message is valid and returns a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Validation Context after the message has been validated
+     * Checks if your message is valid and returns a SimpleSchemaValidationContext after the message has been validated
      * 
      * @method validate
      * @param message {Object} The message you would like to publish. See {{#crossLink "Topic/createMessage:method"}}{{/crossLink}}
      * 
+     * @return {SimpleSchemaValidationContext}
      */
     _self.validate = function(message){
         check(message, Object);

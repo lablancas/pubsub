@@ -9,6 +9,7 @@
 /**
  * Creates a {{#crossLink "Topic"}}{{/crossLink}} Object 
  * 
+ * @for PubSub
  * @method createTopic
  * @param name {String} name to assign to the created {{#crossLink "Topic"}}{{/crossLink}}
  * @return {Topic} the created {{#crossLink "Topic"}}{{/crossLink}}
@@ -18,12 +19,13 @@ PubSub.createTopic = function(name){
     return new Topic(name);
 };
 
- /**
-  * Returns the current, active subscribers
-  * 
-  * @method getActiveSubscribers
-  * @param topic {Topic} [Optional] Used to filter Active Subscribers based on a {{#crossLink "Topic"}}{{/crossLink}}
-  * @return <a href="http://docs.meteor.com/#/full/mongo_cursor">Mongo.Cursor</a> A cursor object containing the Topic Subscribers of a {{#crossLink "Topic"}}{{/crossLink}} or all Topics
+/**
+ * Returns the current, active subscribers
+ * 
+ * @for PubSub
+ * @method getActiveSubscribers
+ * @param topic {Topic} [Optional] Used to filter Active Subscribers based on a {{#crossLink "Topic"}}{{/crossLink}}
+ * @return Mongo.Cursor A cursor object containing the Topic Subscribers of a Topic or all Topics
  */
 PubSub.getActiveSubscribers = function(topic){
     check(topic, Match.Optional(Topic));
@@ -40,17 +42,18 @@ PubSub.getActiveSubscribers = function(topic){
 };
 
 /**
-  * Publish a message on a {{#crossLink "Topic"}}{{/crossLink}}
-  * 
-  * @method publish
-  * @param topic {Topic} Used to define the Topic where you want to publish your message
-  * @param messageBody {Object} The body of the message to publish. May not yet have an _id attribute, in which case Meteor will generate one for you.
-  * @param callback {Function} [Optional] If present, called with an error object as the first argument and, if no error, the _id as the second.
-  * @return {String} the unique ID assigned to your published message if successful
-  * 
-  * @throws {Error} an object containing the errors found when your message was validated
-  * 
-  */
+ * Publish a message on a {{#crossLink "Topic"}}{{/crossLink}}
+ * 
+ * @for PubSub
+ * @method publish
+ * @param topic {Topic} Used to define the Topic where you want to publish your message
+ * @param messageBody {Object} The body of the message to publish. May not yet have an _id attribute, in which case Meteor will generate one for you.
+ * @param callback {Function} [Optional] If present, called with an error object as the first argument and, if no error, the _id as the second.
+ * @return {String} the unique ID assigned to your published message if successful
+ * 
+ * @throws {Error} an object containing the errors found when your message was validated
+ * 
+ */
 PubSub.publish = function(topic, messageBody, callback){
     check(topic,       Topic);
     check(callback,    Match.Optional(Function) );
@@ -71,15 +74,16 @@ PubSub.publish = function(topic, messageBody, callback){
 };
 
 /**
-  * Creates a topic subscriber which calls the function defined by the caller. Returns a Subscriber Object.
-  * 
-  * @method subscribe
-  * @param topic {Topic} Used to define the Topic where you want to subscribe for messages
-  * @param fn {Function} Function to call when a message is created on this topic. Called with a userId as the first argument and the message as the second.
-  * @param selector {Object} [Optional] A Mongo Selector used to check the contents of a message to determine if it should be passed to your Function
-  * 
-  * @return {Object} A Topic Subscriber Object
-  */
+ * Creates a topic subscriber which calls the function defined by the caller. Returns a Subscriber Object.
+ * 
+ * @for PubSub
+ * @method subscribe
+ * @param topic {Topic} Used to define the Topic where you want to subscribe for messages
+ * @param fn {Function} Function to call when a message is created on this topic. Called with a userId as the first argument and the message as the second.
+ * @param selector {Object} [Optional] A Mongo Selector used to check the contents of a message to determine if it should be passed to your Function
+ * 
+ * @return {Object} A Topic Subscriber Object
+ */
 PubSub.subscribe = function(topic, fn, selector){
     check(topic,        Topic);
     check(fn,           Function);
@@ -119,12 +123,13 @@ PubSub.subscribe = function(topic, fn, selector){
 };
 
 /**
-  * Removes a topic subscriber
-  * 
-  * @method unsubscribe
-  * @param subscriber {Object} The object returned from calling {{#crossLink "PubSub/subscribe:method"}}{{/crossLink}}
-  * 
-  */
+ * Removes a topic subscriber
+ * 
+ * @for PubSub
+ * @method unsubscribe
+ * @param subscriber {Object} The object returned from calling {{#crossLink "PubSub/subscribe:method"}}{{/crossLink}}
+ * 
+ */
 PubSub.unsubscribe = function(subscriber){
     check(subscriber,       Object);
     check(subscriber._id,   String);
@@ -144,6 +149,7 @@ PubSub.getActiveSubscribers().forEach(PubSub.unsubscribe);
 /**
  * Determines if a doc matches a selector.
  * 
+ * @for PubSub
  * @method matchesSelector
  * @param message {Object} The message document to check if it matches with the selector.
  * @param selector {Object} A Mongo Selector used to check the contents of the message to determine if the method is a match

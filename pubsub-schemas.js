@@ -11,11 +11,12 @@
  * 
  * @class AutoValues
  * @static
+ * @private
  */
 AutoValues = {};
 
 /**
- * This method is used to automatically set a created at Date value in a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object
+ * This method is used to automatically set a created at Date value in a SimpleSchema Object
  * 
  * @method createdAtAutoValue
  */
@@ -30,7 +31,7 @@ AutoValues.createdAtAutoValue = function() {
 };
 
 /**
- * This method is used to automatically set a created by String value in a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object.
+ * This method is used to automatically set a created by String value in a SimpleSchema Object.
  * Created By represents the currently logged in Meteor user or 'server'
  * 
  * @method createdByAutoValue
@@ -47,16 +48,17 @@ AutoValues.createdByAutoValue = function() {
 
 
 /**
- * A static class for storing objects used to build <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Objects
+ * A static class for storing objects used to build SimpleSchema Objects
  * 
  * @class Schemas
  * @static
+ * @private
  */
 Schemas = {};
 
 
 /**
- * This is the base Message Schema used to create a <a href="https://atmospherejs.com/aldeed/simple-schema">SimpleSchema</a> Object and validate the 
+ * This is the base Message Schema used to create a SimpleSchema Object and validate the 
  * structure of a Message before it is inserted into the Messages Collection
  * 
  * @property Message

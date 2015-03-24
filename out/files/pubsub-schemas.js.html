@@ -39,8 +39,8 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/AutoValues.html">AutoValues</a></li>
-                                <li><a href="../classes/Collections.html">Collections</a></li>
                                 <li><a href="../classes/PubSub.html">PubSub</a></li>
+                                <li><a href="../classes/PubSub.Collections.html">PubSub.Collections</a></li>
                                 <li><a href="../classes/Schemas.html">Schemas</a></li>
                                 <li><a href="../classes/Topic.html">Topic</a></li>
                             </ul>
@@ -96,11 +96,12 @@
  * 
  * @class AutoValues
  * @static
+ * @private
  */
 AutoValues = {};
 
 /**
- * This method is used to automatically set a created at Date value in a &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; Object
+ * This method is used to automatically set a created at Date value in a SimpleSchema Object
  * 
  * @method createdAtAutoValue
  */
@@ -115,7 +116,7 @@ AutoValues.createdAtAutoValue = function() {
 };
 
 /**
- * This method is used to automatically set a created by String value in a &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; Object.
+ * This method is used to automatically set a created by String value in a SimpleSchema Object.
  * Created By represents the currently logged in Meteor user or &#x27;server&#x27;
  * 
  * @method createdByAutoValue
@@ -132,16 +133,17 @@ AutoValues.createdByAutoValue = function() {
 
 
 /**
- * A static class for storing objects used to build &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; Objects
+ * A static class for storing objects used to build SimpleSchema Objects
  * 
  * @class Schemas
  * @static
+ * @private
  */
 Schemas = {};
 
 
 /**
- * This is the base Message Schema used to create a &lt;a href=&quot;https://atmospherejs.com/aldeed/simple-schema&quot;&gt;SimpleSchema&lt;/a&gt; Object and validate the 
+ * This is the base Message Schema used to create a SimpleSchema Object and validate the 
  * structure of a Message before it is inserted into the Messages Collection
  * 
  * @property Message
