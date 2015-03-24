@@ -20,7 +20,7 @@ Collections = {};
  * @property Topics
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.Topics           = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.topics");
+Collections.Topics           = new Mongo.Collection("pubsub.topics");
 Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
 delete Collections.Topics.attachSchema;
 
@@ -30,7 +30,7 @@ delete Collections.Topics.attachSchema;
  * @property TopicPublishers
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.TopicPublishers  = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.topic.publishers");
+Collections.TopicPublishers  = new Mongo.Collection("pubsub.topic.publishers");
 
 /**
  * A <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a> object for storing Topic Subscribers
@@ -38,7 +38,7 @@ Collections.TopicPublishers  = new <a href="http://docs.meteor.com/#/full/mongo_
  * @property TopicSubscribers
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.TopicSubscribers = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.topic.subscribers");
+Collections.TopicSubscribers = new Mongo.Collection("pubsub.topic.subscribers");
 Collections.TopicSubscribers.attachSchema(new SimpleSchema(Schemas.TopicSubscriber));
 delete Collections.TopicSubscribers.attachSchema;
 
@@ -56,7 +56,7 @@ Collections.SubscriberFunctions = [];
  * @property Messages
  * @type     <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>
  */
-Collections.Messages         = new <a href="http://docs.meteor.com/#/full/mongo_collection">Mongo.Collection</a>("pubsub.messages");
+Collections.Messages         = new Mongo.Collection("pubsub.messages");
 Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
 delete Collections.Messages.attachSchema;
 
