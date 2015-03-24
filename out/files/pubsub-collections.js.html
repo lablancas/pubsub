@@ -105,7 +105,7 @@ Collections = {};
  * @property Topics
  * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
  */
-Collections.Topics           = new &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;(&quot;pubsub.topics&quot;);
+Collections.Topics           = new Mongo.Collection(&quot;pubsub.topics&quot;);
 Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
 delete Collections.Topics.attachSchema;
 
@@ -115,7 +115,7 @@ delete Collections.Topics.attachSchema;
  * @property TopicPublishers
  * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
  */
-Collections.TopicPublishers  = new &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;(&quot;pubsub.topic.publishers&quot;);
+Collections.TopicPublishers  = new Mongo.Collection(&quot;pubsub.topic.publishers&quot;);
 
 /**
  * A &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt; object for storing Topic Subscribers
@@ -123,7 +123,7 @@ Collections.TopicPublishers  = new &lt;a href=&quot;http://docs.meteor.com/#/ful
  * @property TopicSubscribers
  * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
  */
-Collections.TopicSubscribers = new &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;(&quot;pubsub.topic.subscribers&quot;);
+Collections.TopicSubscribers = new Mongo.Collection(&quot;pubsub.topic.subscribers&quot;);
 Collections.TopicSubscribers.attachSchema(new SimpleSchema(Schemas.TopicSubscriber));
 delete Collections.TopicSubscribers.attachSchema;
 
@@ -141,7 +141,7 @@ Collections.SubscriberFunctions = [];
  * @property Messages
  * @type     &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;
  */
-Collections.Messages         = new &lt;a href=&quot;http://docs.meteor.com/#/full/mongo_collection&quot;&gt;Mongo.Collection&lt;/a&gt;(&quot;pubsub.messages&quot;);
+Collections.Messages         = new Mongo.Collection(&quot;pubsub.messages&quot;);
 Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
 delete Collections.Messages.attachSchema;
 
