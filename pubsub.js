@@ -106,7 +106,7 @@ PubSub.subscribe = function(topic, fn, selector){
     if(Meteor.isServer)
          PubSub.Collections.SubscriberFunctions[subscriber._id] = fn;
     else
-        PubSub.Collections.SubscriberHandlers[subscriber._id] = topic.find(s).observeChanges({ added: fn });
+        PubSub.Collections.SubscriberHandlers[subscriber._id] = topic.find(s).observe({ added: fn });
     
     PubSub.debug && console.log("PubSub.subscribe: subscriber -> " + JSON.stringify(subscriber) );
     
