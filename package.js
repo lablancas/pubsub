@@ -1,6 +1,6 @@
 Package.describe({
     name: 'lablancas:pubsub',
-    version: '0.0.10',
+    version: '0.0.11',
     // Brief, one-line summary of the package.
     summary: 'A publish/subscribe messaging package designed for Meteor',
     // URL to the Git repository containing the source code for this package.
