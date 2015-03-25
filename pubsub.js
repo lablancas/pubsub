@@ -47,28 +47,24 @@ PubSub.getActiveSubscribers = function(topic){
  * @for PubSub
  * @method publish
  * @param topic {Topic} Used to define the Topic where you want to publish your message
- * @param messageBody {Object} The body of the message to publish. May not yet have an _id attribute, in which case Meteor will generate one for you.
+ * @param message {Object} The message to publish. May not yet have an _id attribute, in which case Meteor will generate one for you.
  * @param callback {Function} [Optional] If present, called with an error object as the first argument and, if no error, the _id as the second.
  * @return {String} the unique ID assigned to your published message if successful
  * 
  * @throws {Error} an object containing the errors found when your message was validated
  * 
  */
-PubSub.publish = function(topic, messageBody, callback){
+PubSub.publish = function(topic, message, callback){
     check(topic,       Topic);
+    check(message,     Object);
     check(callback,    Match.Optional(Function) );
 
-
-    var message = topic.createMessage(messageBody);
-    
     PubSub.debug && console.log("PubSub.publish -> " + JSON.stringify(message) );
 
     var validator = topic.validate(message);
     
-    if(validator.isValid()){
-        topic.getSchema().clean(message);
+    if(validator.isValid())
         return PubSub.Collections.Messages.insert(message, callback);
-    }
     else
         throw validator.getErrorObject(); 
 };
@@ -98,25 +94,21 @@ PubSub.subscribe = function(topic, fn, selector){
     if( Match.test(selector, Object) )
         subscriber.selector = JSON.stringify(selector);
     
-    subscriber._id = PubSub.Collections.TopicSubscribers.insert(subscriber);
-    PubSub.Collections.SubscriberFunctions[subscriber._id] = fn;
-
-    /* This didn't work
-    SubscriberFunctions[subscriber._id] = function(userId, message){
-        
-        var validator = topic.validate(message)
-        
-        if(validator.isValid())
-            fn(userId, message);
-        
-        else {
-            PubSub.debug && console.log( "TopicSubscriber " + JSON.stringify(subscriber) + " receiving invalid message format " + JSON.stringify(message) );
-            PubSub.debug && console.log( validator.getErrorObject() );
-        }
-    }
-    */
     
-    PubSub.debug && console.log("PubSub.subscribe -> " + JSON.stringify(subscriber) );
+    subscriber._id = PubSub.Collections.TopicSubscribers.insert(subscriber);
+    
+    var s = { $and: [{'header.createdAt': {$gte: new Date()}}] };
+    if( Match.test(selector, Object) )
+        s.$and.push(selector);
+    
+    PubSub.debug && console.log("PubSub.subscribe: selector -> " + JSON.stringify(s));
+    
+    if(Meteor.isServer)
+         PubSub.Collections.SubscriberFunctions[subscriber._id] = fn;
+    else
+        PubSub.Collections.SubscriberHandlers[subscriber._id] = topic.find(s).observeChanges({ added: fn });
+    
+    PubSub.debug && console.log("PubSub.subscribe: subscriber -> " + JSON.stringify(subscriber) );
     
     return subscriber;
 
@@ -136,7 +128,20 @@ PubSub.unsubscribe = function(subscriber){
     check(subscriber.topic, String);
 
     PubSub.Collections.TopicSubscribers.update(subscriber._id, {$set: {stoppedAt: new Date()}});
-    delete PubSub.Collections.SubscriberFunctions[subscriber._id];
+    
+    if(Meteor.isServer)
+        delete PubSub.Collections.SubscriberFunctions[subscriber._id];
+    else{
+
+        var handler = PubSub.Collections.SubscriberHandlers[subscriber._id];
+
+        if( !Match.test(handler, undefined) && Match.test(handler.stop, Function) ){
+            console.log("Stopping Observer " + subscriber._id);
+            PubSub.Collections.SubscriberHandlers[subscriber._id].stop();
+        }
+        
+        delete PubSub.Collections.SubscriberHandlers[subscriber._id];
+    }
     
     PubSub.debug && console.log("PubSub.unsubscribe -> " + JSON.stringify(subscriber) );
     

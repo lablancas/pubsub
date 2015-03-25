@@ -69,7 +69,7 @@ Schemas.Message = {
     //Auto-generated Mongo document _id is used as the message ID
     //_id:    { type: String }, 
     
-    header: {
+    'header': {
         type: Object
     },
     
@@ -97,13 +97,13 @@ Schemas.Message = {
     'header.type':          { type: String,  optional: true }, // NOT IN USE: Need description.
     'header.redelivered':   { type: Boolean, optional: true }, // NOT IN USE: Need description.
     
-    properties: {
+    'properties': {
         type: Object,
         optional: true,
         blackbox: true
     },
     
-    body: {
+    'body': {
         type: Object,
         optional: true,
         blackbox: true

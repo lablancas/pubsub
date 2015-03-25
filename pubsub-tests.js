@@ -29,8 +29,8 @@ TEST_CASES = [
     {name: 'WITH message schema & WITH message body (Object) & VALID message body schema = SUCCESS',
      schema: {text: {type: String}}, body: {text: 'Hello World'}, success: true},
 
-    {name: 'WITH message schema & WITH message body & extra property = ERROR',
-     schema: {text: {type: String}}, body: {text: 'Hello World', comment: 'This should not work'}, success: false},
+    {name: 'WITH message schema & WITH message body & extra property = SUCCESS',
+     schema: {text: {type: String}}, body: {text: 'Hello World', comment: 'This should be filtered out'}, success: true},
 
     {name: 'WITH message schema & NO   message body = ERROR',
      schema: {text: {type: String}}, success: false},
@@ -46,6 +46,16 @@ TEST_CASES = [
 
 ];
 
+login = function(){
+    // setup
+    this.username = Random.id();
+    this.email = Random.id() + '-intercept@example.com';
+    this.password = 'password';
+
+    Accounts.createUser({username: this.username, email: this.email, password: this.password});
+    Meteor.loginWithPassword(this.username, this.password);
+};
+
 cleanup = function(){
     PubSub.Collections.Messages.find().forEach(function(msg){ PubSub.Collections.Messages.remove(msg._id); });
     PubSub.Collections.TopicSubscribers.find().forEach(PubSub.unsubscribe);
@@ -53,6 +63,7 @@ cleanup = function(){
 };
 
 Tinytest.add('PubSub - Validate Exported Objects', function(test){
+    if(Meteor.isClient) login();
     
     test.isTrue( _.isFunction(PubSub.matchesSelector)  ,     "Matches Selector should be a public function" );
     test.isTrue( _.isFunction(PubSub.getActiveSubscribers),  "Get Active Subscribers should be a public function"  );
@@ -72,6 +83,8 @@ Tinytest.add('PubSub - Topic Constructor', function(test){
     var debug = false;
     PubSub.debug = debug;
     SimpleSchema.debug = debug;
+    
+    if(Meteor.isClient) login();
     
     var topic = PubSub.createTopic(test.id);
     
@@ -102,9 +115,11 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
     PubSub.debug = debug;
     SimpleSchema.debug = debug;
     
+    if(Meteor.isClient) login();
+    
     var topic = PubSub.createTopic(test.id);
     
-    debug && console.log( Topics.findOne({name: test.id}) );
+    debug && console.log( PubSub.Collections.Topics.findOne({name: test.id}) );
     
     var testCases = _.clone(TEST_CASES);
     
@@ -124,7 +139,8 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
             try{
                 debug && console.log(testCaseLogPrefix + "before publishing: " + JSON.stringify(testCaseMessage) );
                 
-                testCaseMessage._id = PubSub.publish(topic, testCaseMessage.body);
+                testCaseMessage = topic.createMessage(testCaseMessage.body);
+                testCaseMessage._id = PubSub.publish(topic, testCaseMessage);
                 
                 if(testCaseMessage.body && testCaseMessage.body.text)
                     test.isTrue( PubSub.matchesSelector(testCaseMessage, {'body.text': 'Hello World'}) );
@@ -146,7 +162,8 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
         else {
             try{
                 
-                testCaseMessage._id = PubSub.publish(topic, testCaseMessage.body);
+                testCaseMessage = topic.createMessage(testCaseMessage.body);
+                testCaseMessage._id = PubSub.publish(topic, testCaseMessage);
                 
                 if(Meteor.isClient){
                     foundMessage = topic.findOne(testCaseMessage._id);
@@ -169,77 +186,56 @@ Tinytest.add('PubSub - Topic Publishing', function(test){
     cleanup();
 });
 
-Tinytest.addAsync('PubSub - Topic Subscribing (No Selector)', function(test, done){
+Tinytest.addAsync('PubSub - Topic Subscribing', function(test, done){
     var debug = false;
     PubSub.debug = debug;
     SimpleSchema.debug = debug;
     
+    if(Meteor.isClient) login();
+    
     var topic = PubSub.createTopic(test.id);
     
     var testCases = _.clone(TEST_CASES);
-    var receivedEvents = [];
-    var expectedCalls = _.filter(testCases, function(doc){ return doc.success; }).length;
     
-    debug && console.log("expecting " + expectedCalls + " received events");
+    //NO Selector Variables
+    var receivedEventsNoSelector = [];
+    var expectedCallsNoSelector = _.filter(testCases, function(doc){ return doc.success; }).length;
+    var noSelectorDone = false;
     
-    var subscriber = PubSub.subscribe(topic, function(userId, message){
-        receivedEvents.push(message);
+    //WITH Selector Variables
+    var receivedEventsWithSelector = [];
+    var expectedCallsWithSelector = _.filter(testCases, function(doc){ 
+        if(doc.body && doc.body.text)
+            return doc.body.text === "Hello World" && doc.success; 
+        else
+            return false;
+    }).length;
+    var withSelectorDone = false;
+    
+    //Start NO Selector Subscriber
+    var subscriberNoSelector = PubSub.subscribe(topic, function(userId, message){
+        receivedEventsNoSelector.push(message);
         
-        debug && console.log("received " + receivedEvents.length + " events");
+        debug && console.log("No Selector: received " + receivedEventsNoSelector.length + " events; expecting " + expectedCallsNoSelector);
         
-        if(receivedEvents.length === expectedCalls){    
+        noSelectorDone = receivedEventsNoSelector.length === expectedCallsNoSelector;
+        
+        if(noSelectorDone && withSelectorDone){
             cleanup();
             done();
         }
         
     });
     
-    test.equal( PubSub.getActiveSubscribers(topic).count(), 1 );
-    
-    for(i=0; i < testCases.length; i++){
-        
-        var testCase = testCases[i];
-        
-        var testCaseMessage = {};  
-        var foundMessage = {};
-        
-        topic.setSchema( Match.test(testCase.schema, Object) ? new SimpleSchema(testCase.schema) : testCase.schema);
-        
-        if(testCase.body)
-            testCaseMessage.body = testCase.body;
-        
-        try{
-            testCaseMessage._id = PubSub.publish(topic, testCaseMessage.body);
-        }
-        catch(e){}
-    }
-   
-});
-
-
-Tinytest.addAsync('PubSub - Topic Subscribing (With Selector)', function(test, done){
-    var debug = false;
-    PubSub.debug = debug;
-    SimpleSchema.debug = debug;
-    
-    var topic = PubSub.createTopic(test.id);
-    
-    var testCases = _.clone(TEST_CASES);
-    var receivedEvents = [];
-    var expectedCalls = _.filter(testCases, function(doc){ 
-        if(doc.body && doc.body.text)
-            return doc.body.text === "Hello World" && doc.success; 
-        else
-            return false;
-    }).length;
-    debug && console.log("expecting " + expectedCalls + " received events");
-    
+    //Start WITH Selector Subscriber
     var fn = function(userId, message){
-        receivedEvents.push(message);
+        receivedEventsWithSelector.push(message);
         
-        debug && console.log("received " + receivedEvents.length + " events");
+        debug && console.log("No Selector: received " + receivedEventsWithSelector.length + " events; expecting " + expectedCallsWithSelector);
         
-        if(receivedEvents.length === expectedCalls){    
+        withSelectorDone = receivedEventsWithSelector.length === expectedCallsWithSelector;
+        
+        if(noSelectorDone && withSelectorDone){
             cleanup();
             done();
         }
@@ -247,7 +243,7 @@ Tinytest.addAsync('PubSub - Topic Subscribing (With Selector)', function(test, d
     
     var subscriber = PubSub.subscribe(topic, fn, {'body.text': 'Hello World'});
     
-    test.equal( PubSub.getActiveSubscribers(topic).count(), 1 );
+    test.equal( PubSub.getActiveSubscribers(topic).count(), 2 );
     
     for(i=0; i < testCases.length; i++){
         
@@ -262,12 +258,11 @@ Tinytest.addAsync('PubSub - Topic Subscribing (With Selector)', function(test, d
             testCaseMessage.body = testCase.body;
         
         try{
-            testCaseMessage._id = PubSub.publish(topic, testCaseMessage.body);
+                testCaseMessage = topic.createMessage(testCaseMessage.body);
+                testCaseMessage._id = PubSub.publish(topic, testCaseMessage);
         }
         catch(e){}
     }
+   
     
 });
-
-
-

@@ -151,15 +151,19 @@ Topic = function(name){
     _self.createMessage = function(messageBody){
         check(messageBody, Match.Optional(Object));
 
-        var message = { header: {createdAt: new Date(), 
-                                 createdBy: 'placeholder', 
-                                 destination: _self.getName()
-                                }
-                      };
+        var message = { header: {destination: _self.getName() } };
 
         if( Match.test(messageBody, Object) )
             message.body = _.clone(messageBody);
 
+        _self.getSchema().clean(message, {filter: true, getAutoValues: true});
+        
+        if( !Match.test(message.header.createdAt, Date) )
+            message.header.createdAt = new Date();
+        
+        if( !Match.test(message.header.createdBy, String) )
+            message.header.createdBy = 'placeholder';
+        
         return message;
     }
     
