@@ -23,7 +23,6 @@ PubSub.Collections = {};
  */
 PubSub.Collections.Topics           = new Mongo.Collection("pubsub.topics");
 PubSub.Collections.Topics.attachSchema(new SimpleSchema(Schemas.Topic));
-delete PubSub.Collections.Topics.attachSchema;
 
 /**
  * A Mongo.Collection object for storing Topics
@@ -43,7 +42,6 @@ PubSub.Collections.TopicPublishers  = new Mongo.Collection("pubsub.topic.publish
  */
 PubSub.Collections.TopicSubscribers = new Mongo.Collection("pubsub.topic.subscribers");
 PubSub.Collections.TopicSubscribers.attachSchema(new SimpleSchema(Schemas.TopicSubscriber));
-delete PubSub.Collections.TopicSubscribers.attachSchema;
 
 /**
  * An Array for storing Subscription Handlers
@@ -72,7 +70,6 @@ PubSub.Collections.SubscriberHandlers = [];
  */
 PubSub.Collections.Messages         = new Mongo.Collection("pubsub.messages");
 PubSub.Collections.Messages.attachSchema(new SimpleSchema(Schemas.Message));
-delete PubSub.Collections.Messages.attachSchema;
 
 /*
  * Publishes a message to all subscribers based on each subscribers selector and architecture.
