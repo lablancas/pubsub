@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/lablancas/pubsub.svg)](https://travis-ci.org/lablancas/pubsub)
 
+[Live Example](http://pubsub-messaging.meteor.com/)
+
 # Publish/Subscribe Messaging
 
 This package provides the capability of defining a Topic for publishing messages.
@@ -63,7 +65,6 @@ Optional. Used to filter Active Subscribers based on Topic
 Determines if a doc matches a selector. Returns true if matches; otherwise, false
 
 ##### Arguments
-
 *message* Object
 The message document to check if it matches with the selector
 
@@ -78,33 +79,31 @@ Topics are created using PubSub.createTopic method above
 Returns the name assigned to this topic. This was provided into the constructor method
 
 ### Topic.find(selector, options)
-Returns a Mongo.Cursor containing the messages in this Topic that match your selector and options. (see http://docs.meteor.com/#/full/find)
+Returns a Mongo.Cursor containing the messages in this Topic that match your selector and options. See [Collection.find](http://docs.meteor.com/#/full/find)
 
 ### Topic.findOne(selector, options)
-Returns the first message object from this Topic matching your selector and options (see http://docs.meteor.com/#/full/findone)
+Returns the first message object from this Topic matching your selector and options See [Collection.findOne](http://docs.meteor.com/#/full/findone)
 
 ### Topic.setSchema(schema)
 Sets the Message Body schema for this Topic. Returns void.
 
 ##### Arguments
 *schema* Object
-The schema you want to use for the body of a message document. This object will be assigned as the type value of the message body so you can use a Javascript Object including a SimpleSchema Object (see https://github.com/aldeed/meteor-simple-schema#schema-rules).
+The schema you want to use for the body of a message document. This object will be assigned as the type value of the message body so you can use a Javascript Object including a [SimpleSchema](https://github.com/aldeed/meteor-simple-schema#schema-rules) Object .
 
 ### Topic.getSchema()
-Returns the SimpleSchema Object attached to this Topic (see https://github.com/aldeed/meteor-collection2/#schema-format)
+Returns the SimpleSchema Object attached to this Topic. See [SimpleSchema Format](https://github.com/aldeed/meteor-collection2/#schema-format)
 
 ### Topic.createMessage(messageBody)
 Creates a message object for you to publish and/or validate.
 
 ##### Arguments
-
 *messageBody* Object
 The body of the message you would like to publish.
 
 ### Topic.validate(message)
-Checks if your message is valid and returns a Simple Schema Validation Context after the message has been validated
+Checks if your message is valid and returns a [Simple Schema Validation Context](https://github.com/aldeed/meteor-simple-schema#validating-data) after the message has been validated
 
 ##### Arguments
-
 *message* Object
 The message you would like to publish. See Topic.createMessage
