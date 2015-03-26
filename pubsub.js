@@ -147,10 +147,6 @@ PubSub.unsubscribe = function(subscriber){
     
 };
 
-// clear old subscribers out
-PubSub.getActiveSubscribers().forEach(PubSub.unsubscribe);
-
-
 /**
  * Determines if a doc matches a selector.
  * 

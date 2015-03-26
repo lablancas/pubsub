@@ -26,6 +26,7 @@ Package.onUse(function(api) {
     api.addFiles('pubsub-collections.js');
     api.addFiles('pubsub-collection-permissions.js');
     api.addFiles('pubsub.js');
+    api.addFiles('pubsub-startup.js');
     
     api.export('PubSub');
 });

@@ -9,3 +9,5 @@ TODO add Subscriber pattern matching ('top.*.grandchild', 'top.>')
 TODO remove api.versionsFrom ???
 
 FIXME issue where cannot specify message body schema type as primitive javascript object (e.g. String, Number, Date). See test cases
+
+TODO improve testing to validate the contents of message body
